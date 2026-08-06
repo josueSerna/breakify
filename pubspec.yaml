@@ -12,6 +12,8 @@ topics:
   - breakpoints
   - layout
   - widgets
+  - flutter-package
+  - adaptive-layout
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
