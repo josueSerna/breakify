@@ -1,10 +1,21 @@
-# Breakify
+<p align="center">
+  <img src="assets/breakify_banner.jpeg" width="180" alt="Breakify Logo">
+</p>
 
+<h1 align="center">Breakify</h1>
+
+<p align="center">
 A lightweight responsive layout toolkit for Flutter.
+</p>
 
-Breakify helps you build responsive applications using breakpoints, responsive values, and adaptive widgets without scattering screen size checks throughout your code.
+<p align="center">
+Build responsive applications using breakpoints, responsive values,
+and adaptive widgets without scattering screen size checks throughout your code.
+</p>
 
+<p align="center">
 Designed to work seamlessly on mobile, tablet, desktop, and Flutter Web.
+</p>
 
 ---
 

@@ -1,12 +1,22 @@
-# Breakify
+<p align="center">
+  <img src="assets/breakify_banner.jpeg" width="180" alt="Logo de Breakify">
+</p>
 
-Un conjunto de herramientas para crear interfaces responsivas en Flutter de forma sencilla.
+<h1 align="center">Breakify</h1>
 
-Breakify te ayuda a construir aplicaciones responsivas utilizando breakpoints, valores responsivos y widgets adaptativos, sin tener que llenar tu código de comprobaciones del tamaño de la pantalla.
+<p align="center">
+Un conjunto de herramientas para crear interfaces responsivas en Flutter.
+</p>
 
-Está diseñado para funcionar tanto en aplicaciones móviles como en tabletas, escritorio y Flutter Web.
+<p align="center">
+Breakify te ayuda a construir aplicaciones adaptables utilizando breakpoints,
+valores responsivos y widgets adaptativos sin llenar tu código de comprobaciones
+del tamaño de la pantalla.
+</p>
 
----
+<p align="center">
+Diseñado para funcionar en aplicaciones móviles, tabletas, escritorio y Flutter Web.
+</p>
 
 ## Características
 
