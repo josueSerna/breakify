@@ -1,11 +1,21 @@
-name: flexify
-description: "Widgets reutilizables para responsive desing en Flutter Web"
+name: breakify
+description: Responsive widgets and utilities for Flutter applications.
 version: 0.1.0
-homepage:
+
+repository: https://github.com/josueSerna/breakify
+homepage: https://github.com/josueSerna/breakify
+issue_tracker: https://github.com/josueSerna/breakify/issues
+
+topics:
+  - flutter
+  - responsive
+  - breakpoints
+  - layout
+  - widgets
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
-  flutter: '>=3.10.0'
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
 
 dependencies:
   flutter:
@@ -17,4 +27,3 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
 flutter:
-

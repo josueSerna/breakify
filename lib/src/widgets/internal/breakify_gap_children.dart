@@ -1,9 +1,11 @@
 import 'package:flutter/widgets.dart';
 
-/// Internal helper that intersperses [SizedBox] gaps between widgets.
+/// Inserts a fixed gap between each widget in [children].
 ///
-/// Not part of the public API.
-List<Widget> flexifyGapChildren(
+/// A [SizedBox] is used to create the spacing along the given [direction].
+///
+/// This is an internal helper and is not part of Breakify's public API.
+List<Widget> breakifyGapChildren(
   List<Widget> children,
   double gap,
   Axis direction,

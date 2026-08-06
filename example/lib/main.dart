@@ -1,5 +1,4 @@
-// example/lib/main.dart
-import 'package:flexify/flexify.dart';
+import 'package:breakify/breakify.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -11,10 +10,8 @@ class FlexifyExampleApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlexifyScope(
-      // Breakpoints por defecto (estilo Tailwind).
-      // Cambialos acá para probar cómo reacciona todo el ejemplo.
-      breakpoints: FlexifyBreakpoints.defaults,
+    return BreakifyScope(
+      breakpoints: BreakifyBreakpoints.defaults,
       child: MaterialApp(
         title: 'Flexify Example',
         debugShowCheckedModeBanner: false,
@@ -30,25 +27,28 @@ class FlexifyExampleHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlexifyDebugBanner(
-      corner: FlexifyBannerCorner.topRight,
+    return BreakifyDebugBanner(
+      corner: BreakifyBannerCorner.topRight,
       child: Scaffold(
         backgroundColor: Colors.grey.shade50,
         appBar: AppBar(title: const Text('Flexify — Example')),
         body: SingleChildScrollView(
-          child: FlexifyContainer(
-            maxWidth: const FlexifyValue(sm: 1100),
-            padding: const FlexifyValue(
-              sm: EdgeInsets.all(16),
-              lg: EdgeInsets.all(32),
-            ),
-            child: FlexifyColumn(
-              spacing: const FlexifyValue(sm: 24, lg: 40),
+          child: BreakifyContainer(
+            maxWidth: BreakifyValue(sm: 1200),
+            child: Column(
+              spacing: context.resolve(const BreakifyValue(sm: 24, lg: 40)),
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: const [
-                _HeaderSection(),
-                _NavBarDemo(),
+                // Header + NavBar responsive
+                BreakifyAdaptativeLayout(
+                  breakpoint: BreakifyBreakpoint.md,
+                  spacing: BreakifyValue(sm: 16, md: 24),
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  distributeEvenly: true,
+                  children: [_HeaderSection(), _NavBarDemo()],
+                ),
                 _GridDemo(),
+                _ListDemo(),
                 _PaddingDemo(),
               ],
             ),
@@ -59,8 +59,6 @@ class FlexifyExampleHome extends StatelessWidget {
   }
 }
 
-/// Muestra el breakpoint actual con texto grande, usando context.breakpoint
-/// directo (sin ningún widget de Flexify, solo la extension).
 class _HeaderSection extends StatelessWidget {
   const _HeaderSection();
 
@@ -72,8 +70,8 @@ class _HeaderSection extends StatelessWidget {
         color: Colors.indigo.shade50,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: FlexifyColumn(
-        spacing: const FlexifyValue(sm: 8),
+      child: Column(
+        spacing: context.resolve(const BreakifyValue(sm: 8)),
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -81,7 +79,7 @@ class _HeaderSection extends StatelessWidget {
             style: Theme.of(context).textTheme.titleLarge,
           ),
           Text(
-            'Ancho de pantalla: ${context.flexifyWidth.round()}px',
+            'Ancho de pantalla: ${context.breakifyWidth.round()}px',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const Text(
@@ -94,8 +92,6 @@ class _HeaderSection extends StatelessWidget {
   }
 }
 
-/// Demuestra FlexifyVisibility: menú hamburguesa en mobile,
-/// links completos en desktop.
 class _NavBarDemo extends StatelessWidget {
   const _NavBarDemo();
 
@@ -103,16 +99,16 @@ class _NavBarDemo extends StatelessWidget {
   Widget build(BuildContext context) {
     return _Card(
       title: 'FlexifyVisibility',
-      child: FlexifyRow(
-        spacing: const FlexifyValue(sm: 12),
+      child: Row(
+        spacing: context.resolve(const BreakifyValue(sm: 12)),
         children: [
-          FlexifyVisibility(
-            maxBreakpoint: FlexifyBreakpoint.md,
+          BreakifyVisibility(
+            maxBreakpoint: BreakifyBreakpoint.md,
             child: const Icon(Icons.menu),
           ),
           const Expanded(child: Text('Mi App')),
-          FlexifyVisibility(
-            minBreakpoint: FlexifyBreakpoint.lg,
+          BreakifyVisibility(
+            minBreakpoint: BreakifyBreakpoint.md,
             replacement: const Icon(Icons.person),
             child: TextButton.icon(
               onPressed: () {},
@@ -126,7 +122,6 @@ class _NavBarDemo extends StatelessWidget {
   }
 }
 
-/// Demuestra FlexifyGrid: columnas que crecen según el breakpoint.
 class _GridDemo extends StatelessWidget {
   const _GridDemo();
 
@@ -134,14 +129,22 @@ class _GridDemo extends StatelessWidget {
   Widget build(BuildContext context) {
     return _Card(
       title: 'FlexifyGrid',
-      heigth: 500,
-      child: Expanded(
-        child: FlexifyGrid(
-          columns: const FlexifyValue(sm: 2, md: 3, lg: 4),
-          spacing: const FlexifyValue(sm: 12),
-          childAspectRatio: const FlexifyValue(sm: 1.2),
-          shrinkWrap: true,
-          children: List.generate(8, (i) => _GridTile(index: i)),
+      height: 500,
+      child: const Expanded(
+        child: BreakifyGrid(
+          columns: BreakifyValue(sm: 2, md: 3, lg: 4),
+          spacing: BreakifyValue(sm: 12),
+          childAspectRatio: BreakifyValue(sm: 1.2),
+          children: [
+            _GridTile(index: 0),
+            _GridTile(index: 1),
+            _GridTile(index: 2),
+            _GridTile(index: 3),
+            _GridTile(index: 4),
+            _GridTile(index: 5),
+            _GridTile(index: 6),
+            _GridTile(index: 7),
+          ],
         ),
       ),
     );
@@ -150,7 +153,6 @@ class _GridDemo extends StatelessWidget {
 
 class _GridTile extends StatelessWidget {
   final int index;
-
   const _GridTile({required this.index});
 
   @override
@@ -166,7 +168,62 @@ class _GridTile extends StatelessWidget {
   }
 }
 
-/// Demuestra FlexifyPadding con un valor fluido (interpolado).
+class _ListDemo extends StatelessWidget {
+  const _ListDemo();
+
+  @override
+  Widget build(BuildContext context) {
+    return _Card(
+      title: 'Responsive Team Members',
+      height: 420,
+      child: Expanded(
+        child: BreakifyListView(
+          spacing: const BreakifyValue(sm: 8, md: 12, lg: 20, xl: 28),
+          padding: const EdgeInsets.all(16),
+          itemCount: _members.length,
+          itemBuilder: (context, index) {
+            final member = _members[index];
+
+            return Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F5F5),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE0E0E0)),
+              ),
+              child: ListTile(
+                leading: CircleAvatar(child: Text(member.initials)),
+                title: Text(member.name),
+                subtitle: Text(member.role),
+                trailing: const Icon(Icons.chevron_right),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _Member {
+  final String name;
+  final String role;
+
+  const _Member(this.name, this.role);
+
+  String get initials => name.split(' ').map((e) => e[0]).take(2).join();
+}
+
+const _members = [
+  _Member('Emma Wilson', 'UI Designer'),
+  _Member('Liam Johnson', 'Flutter Developer'),
+  _Member('Sophia Brown', 'Backend Developer'),
+  _Member('Noah Davis', 'QA Engineer'),
+  _Member('Olivia Miller', 'Product Manager'),
+  _Member('James Taylor', 'DevOps Engineer'),
+  _Member('Isabella Anderson', 'Mobile Developer'),
+  _Member('Benjamin Thomas', 'Frontend Developer'),
+];
+
 class _PaddingDemo extends StatelessWidget {
   const _PaddingDemo();
 
@@ -174,11 +231,9 @@ class _PaddingDemo extends StatelessWidget {
   Widget build(BuildContext context) {
     return _Card(
       title: 'FlexifyPadding (fluido)',
-      child: FlexifyPadding(
-        padding: FlexifyValue(
-          sm: EdgeInsets.all(
-            context.resolve(const FlexifyFluidValue(sm: 8, xxl: 40)),
-          ),
+      child: Padding(
+        padding: EdgeInsets.all(
+          context.resolve(const BreakifyFluidValue(sm: 8, xxl: 40)),
         ),
         child: Container(
           color: Colors.indigo.shade200,
@@ -200,22 +255,22 @@ class _PaddingDemo extends StatelessWidget {
 class _Card extends StatelessWidget {
   final String title;
   final Widget child;
-  final double? heigth;
+  final double? height;
 
-  const _Card({required this.title, required this.child, this.heigth});
+  const _Card({required this.title, required this.child, this.height});
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: height,
       padding: const EdgeInsets.all(16),
-      height: heigth,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade200),
       ),
-      child: FlexifyColumn(
-        spacing: const FlexifyValue(sm: 12),
+      child: Column(
+        spacing: context.resolve(const BreakifyValue(sm: 12)),
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(title, style: Theme.of(context).textTheme.titleMedium),

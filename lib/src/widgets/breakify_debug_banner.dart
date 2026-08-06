@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
 
-import '../breakpoints/flexify_breakpoints.dart';
-import '../scope/flexify_scope.dart';
+import '../breakpoints/breakify_breakpoints.dart';
+import '../scope/breakify_scope.dart';
 
-/// Defines where the debug banner is displayed.
-enum FlexifyBannerCorner {
+/// Defines the available positions for the debug banner.
+enum BreakifyBannerCorner {
   /// Displays the banner in the top-left corner.
   topLeft,
 
@@ -20,19 +20,20 @@ enum FlexifyBannerCorner {
 
 /// Displays an overlay showing the current responsive breakpoint.
 ///
-/// This widget is intended for development and debugging. It overlays
-/// the current breakpoint name and screen width on top of its child,
-/// making it easy to verify responsive layouts while resizing the window.
+/// This widget is intended for development and debugging purposes.
+/// It overlays the current breakpoint and screen width on top of its
+/// child, making it easier to verify responsive layouts while
+/// resizing the application.
 ///
-/// The banner can be positioned in any corner of the screen and can
-/// be enabled or disabled without removing it from the widget tree.
+/// The banner can be positioned in any corner of the screen and
+/// can be enabled or disabled without removing it from the widget tree.
 ///
-/// Typically, this widget should not be included in production builds.
+/// This widget should typically be excluded from production builds.
 ///
-/// Requires a [FlexifyScope] ancestor unless [breakpoints] is
-/// explicitly provided.
-class FlexifyDebugBanner extends StatelessWidget {
-  /// The widget below this banner.
+/// Requires a [BreakifyScope] ancestor unless a custom
+/// [breakpoints] configuration is provided.
+class BreakifyDebugBanner extends StatelessWidget {
+  /// The widget below the debug banner.
   final Widget child;
 
   /// Whether the banner is visible.
@@ -40,30 +41,30 @@ class FlexifyDebugBanner extends StatelessWidget {
   /// Defaults to `true`.
   final bool enabled;
 
-  /// Breakpoint configuration used to resolve the current screen size.
+  /// Breakpoint configuration used to resolve the current breakpoint.
   ///
-  /// If null, falls back to the [FlexifyBreakpoints] provided by the
-  /// nearest [FlexifyScope] ancestor.
-  final FlexifyBreakpoints? breakpoints;
+  /// If null, the configuration provided by the nearest
+  /// [BreakifyScope] is used.
+  final BreakifyBreakpoints? breakpoints;
 
-  /// Position of the banner on the screen.
-  final FlexifyBannerCorner corner;
+  /// Position of the banner.
+  final BreakifyBannerCorner corner;
 
   /// Creates a debug banner that displays the current breakpoint.
-  const FlexifyDebugBanner({
+  const BreakifyDebugBanner({
     super.key,
     required this.child,
     this.enabled = true,
     this.breakpoints,
-    this.corner = FlexifyBannerCorner.topRight,
+    this.corner = BreakifyBannerCorner.topRight,
   });
 
   @override
   Widget build(BuildContext context) {
     if (!enabled) return child;
 
-    final effectiveBreakpoints = breakpoints ?? context.flexifyBreakpoints;
-    final width = context.flexifyWidth;
+    final effectiveBreakpoints = breakpoints ?? context.breakifyBreakpoints;
+    final width = context.breakifyWidth;
     final breakpoint = effectiveBreakpoints.resolve(width);
 
     return Stack(
@@ -87,24 +88,21 @@ class FlexifyDebugBanner extends StatelessWidget {
     );
   }
 
-  /// Returns whether the banner should be aligned to the top edge.
+  /// Whether the banner is positioned at the top.
   bool get _isTop =>
-      corner == FlexifyBannerCorner.topLeft ||
-      corner == FlexifyBannerCorner.topRight;
+      corner == BreakifyBannerCorner.topLeft ||
+      corner == BreakifyBannerCorner.topRight;
 
-  /// Returns whether the banner should be aligned to the left edge.
+  /// Whether the banner is positioned on the left side.
   bool get _isLeft =>
-      corner == FlexifyBannerCorner.topLeft ||
-      corner == FlexifyBannerCorner.bottomLeft;
+      corner == BreakifyBannerCorner.topLeft ||
+      corner == BreakifyBannerCorner.bottomLeft;
 }
 
 /// Internal widget that renders the debug banner.
-///
-/// Displays the resolved breakpoint together with the current
-/// screen width.
 class _Banner extends StatelessWidget {
   /// Current responsive breakpoint.
-  final FlexifyBreakpoint breakpoint;
+  final BreakifyBreakpoint breakpoint;
 
   /// Current screen width in logical pixels.
   final double width;
@@ -134,18 +132,18 @@ class _Banner extends StatelessWidget {
     );
   }
 
-  /// Returns the banner color associated with each breakpoint.
-  Color _colorFor(FlexifyBreakpoint breakpoint) {
+  /// Returns the color associated with a breakpoint.
+  Color _colorFor(BreakifyBreakpoint breakpoint) {
     switch (breakpoint) {
-      case FlexifyBreakpoint.sm:
+      case BreakifyBreakpoint.sm:
         return const Color(0xFFE53935);
-      case FlexifyBreakpoint.md:
+      case BreakifyBreakpoint.md:
         return const Color(0xFFFB8C00);
-      case FlexifyBreakpoint.lg:
+      case BreakifyBreakpoint.lg:
         return const Color(0xFFFDD835);
-      case FlexifyBreakpoint.xl:
+      case BreakifyBreakpoint.xl:
         return const Color(0xFF43A047);
-      case FlexifyBreakpoint.xxl:
+      case BreakifyBreakpoint.xxl:
         return const Color(0xFF1E88E5);
     }
   }
