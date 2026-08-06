@@ -17,6 +17,16 @@ and adaptive widgets without scattering screen size checks throughout your code.
 Designed to work seamlessly on mobile, tablet, desktop, and Flutter Web.
 </p>
 
+<p align="center">
+  <img src="assets/breakify.gif" alt="Breakify Responsive Demo">
+</p>
+
+<p align="center">
+  <i>
+    Demo grabada en Flutter Web para facilitar la visualización del responsive.
+    Breakify también funciona en aplicaciones móviles y tablets
+</p>
+
 ---
 
 ## Features

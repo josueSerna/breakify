@@ -18,6 +18,18 @@ del tamaño de la pantalla.
 Diseñado para funcionar en aplicaciones móviles, tabletas, escritorio y Flutter Web.
 </p>
 
+<p align="center">
+  <img src="assets/breakify.gif" alt="Breakify Responsive Demo">
+</p>
+
+<p align="center">
+  <i>
+  This demo was recorded using Flutter Web to make responsive behavior easier
+    to visualize. Breakify also works seamlessly on mobile apps and tablets.
+</p>
+
+---
+
 ## Características
 
 * Breakpoints responsivos.
