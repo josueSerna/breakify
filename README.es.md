@@ -1,4 +1,13 @@
 <p align="center">
+  <a href="https://pub.dev/packages/breakify">
+    <img src="https://img.shields.io/pub/v/breakify.svg" alt="Pub Version">
+  </a>
+  <a href="https://github.com/josueSerna/breakify">
+    <img src="https://img.shields.io/github/stars/josueSerna/breakify?style=social" alt="GitHub Stars">
+  </a>
+</p>
+
+<p align="center">
   <img src="assets/breakify_banner.jpeg" width="180" alt="Logo de Breakify">
 </p>
 
