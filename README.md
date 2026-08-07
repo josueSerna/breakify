@@ -9,7 +9,7 @@
   </a>
 </p>
 
-<p align="start">
+<p align="center">
   <img src="assets/breakify_banner.jpeg" width="300" alt="Breakify Logo">
 </p>
 
