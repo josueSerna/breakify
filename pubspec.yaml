@@ -10,9 +10,7 @@ topics:
   - flutter
   - responsive
   - breakpoints
-  - layout
   - widgets
-  - flutter-package
   - adaptive-layout
 
 environment:
