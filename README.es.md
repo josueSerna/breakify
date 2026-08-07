@@ -1,4 +1,6 @@
-<p align="center">
+<h1 align="start">Breakify</h1>
+
+<p align="start">
   <a href="https://pub.dev/packages/breakify">
     <img src="https://img.shields.io/pub/v/breakify.svg" alt="Pub Version">
   </a>
@@ -11,19 +13,19 @@
   <img src="assets/breakify_banner.jpeg" width="180" alt="Logo de Breakify">
 </p>
 
-<h1 align="center">Breakify</h1>
 
-<p align="center">
+
+<p align="start">
 Un conjunto de herramientas para crear interfaces responsivas en Flutter.
 </p>
 
-<p align="center">
+<p align="start">
 Breakify te ayuda a construir aplicaciones adaptables utilizando breakpoints,
 valores responsivos y widgets adaptativos sin llenar tu código de comprobaciones
 del tamaño de la pantalla.
 </p>
 
-<p align="center">
+<p align="start">
 Diseñado para funcionar en aplicaciones móviles, tabletas, escritorio y Flutter Web.
 </p>
 
@@ -31,7 +33,7 @@ Diseñado para funcionar en aplicaciones móviles, tabletas, escritorio y Flutte
   <img src="assets/breakify.gif" alt="Breakify Responsive Demo">
 </p>
 
-<p align="center">
+<p align="start">
   <i>
   This demo was recorded using Flutter Web to make responsive behavior easier
     to visualize. Breakify also works seamlessly on mobile apps and tablets.

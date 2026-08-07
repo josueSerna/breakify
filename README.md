@@ -1,4 +1,6 @@
-<p align="center">
+<h1 align="start">Breakify</h1>
+
+<p align="start">
   <a href="https://pub.dev/packages/breakify">
     <img src="https://img.shields.io/pub/v/breakify.svg" alt="Pub Version">
   </a>
@@ -7,22 +9,20 @@
   </a>
 </p>
 
-<p align="center">
-  <img src="assets/breakify_banner.jpeg" width="180" alt="Breakify Logo">
+<p align="start">
+  <img src="assets/breakify_banner.jpeg" width="300" alt="Breakify Logo">
 </p>
 
-<h1 align="center">Breakify</h1>
-
-<p align="center">
+<p align="start">
 A lightweight responsive layout toolkit for Flutter.
 </p>
 
-<p align="center">
+<p align="start">
 Build responsive applications using breakpoints, responsive values,
 and adaptive widgets without scattering screen size checks throughout your code.
 </p>
 
-<p align="center">
+<p align="start">
 Designed to work seamlessly on mobile, tablet, desktop, and Flutter Web.
 </p>
 
@@ -30,7 +30,7 @@ Designed to work seamlessly on mobile, tablet, desktop, and Flutter Web.
   <img src="assets/breakify.gif" alt="Breakify Responsive Demo">
 </p>
 
-<p align="center">
+<p align="start">
   <i>
     Demo grabada en Flutter Web para facilitar la visualización del responsive.
     Breakify también funciona en aplicaciones móviles y tablets
