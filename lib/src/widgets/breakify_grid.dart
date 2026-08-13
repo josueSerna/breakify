@@ -3,6 +3,7 @@ import 'package:breakify/src/builders/breakify_builder.dart';
 import 'package:breakify/src/scope/breakify_scope.dart';
 import 'package:breakify/src/values/breakify_resolvable.dart';
 import 'package:breakify/src/values/breakify_value.dart';
+import 'package:breakify/src/widgets/internal/breakify_equal_heigth_grid.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
@@ -101,6 +102,20 @@ class BreakifyGrid extends StatelessWidget {
   /// [PrimaryScrollController].
   final bool? primary;
 
+  /// Whether all items in the same row should have the same height.
+  ///
+  /// When enabled, the height of each row is determined by its
+  /// tallest child. The remaining children in that row are stretched
+  /// to match that height.
+  ///
+  /// This option is intended for grids containing items with
+  /// different intrinsic heights.
+  ///
+  /// The [childAspectRatio] is ignored when this option is enabled.
+  ///
+  /// Currently only supported with [Axis.vertical].
+  final bool equalHeight;
+
   /// Creates a responsive grid.
   const BreakifyGrid({
     super.key,
@@ -119,7 +134,12 @@ class BreakifyGrid extends StatelessWidget {
     this.scrollCacheExtent,
     this.reverse = false,
     this.primary,
-  });
+    this.equalHeight = false,
+  }) : assert(
+          !equalHeight || scrollDirection == Axis.vertical,
+          'BreakifyGrid.equalHeight currently only supports '
+          'Axis.vertical.',
+        );
 
   @override
   Widget build(BuildContext context) {
@@ -151,34 +171,50 @@ class BreakifyGrid extends StatelessWidget {
             ) ??
             spacingValue ??
             0;
-
-        final aspectRatio = childAspectRatio.resolve(
-          breakpoint,
-          width,
-          effectiveBreakpoints,
-        );
-
         final isUnboundedHeight = constraints.maxHeight.isInfinite;
 
-        return GridView.builder(
-          scrollDirection: scrollDirection,
-          controller: controller,
-          scrollCacheExtent: scrollCacheExtent,
-          reverse: reverse,
-          primary: primary,
-          padding: padding,
-          physics: physics ??
-              (isUnboundedHeight ? const NeverScrollableScrollPhysics() : null),
-          shrinkWrap: shrinkWrap || isUnboundedHeight,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            crossAxisSpacing: crossSpacing,
-            mainAxisSpacing: mainSpacing,
-            childAspectRatio: aspectRatio,
-          ),
-          itemCount: children.length,
-          itemBuilder: (context, index) => children[index],
-        );
+        if (!equalHeight) {
+          final aspectRatio =
+              childAspectRatio.resolve(breakpoint, width, effectiveBreakpoints);
+
+          return GridView.builder(
+            scrollDirection: scrollDirection,
+            controller: controller,
+            scrollCacheExtent: scrollCacheExtent,
+            reverse: reverse,
+            primary: primary,
+            padding: padding,
+            physics: physics ??
+                (isUnboundedHeight
+                    ? const NeverScrollableScrollPhysics()
+                    : null),
+            shrinkWrap: shrinkWrap || isUnboundedHeight,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: crossSpacing,
+              mainAxisSpacing: mainSpacing,
+              childAspectRatio: aspectRatio,
+            ),
+            itemCount: children.length,
+            itemBuilder: (context, index) => children[index],
+          );
+        }
+
+        return BreakifyEqualHeigthGrid(
+            columns: crossAxisCount,
+            crossSpacing: crossSpacing,
+            mainSpacing: mainSpacing,
+            padding: padding,
+            physics: physics ??
+                (isUnboundedHeight
+                    ? const NeverScrollableScrollPhysics()
+                    : null),
+            shrinkWrap: shrinkWrap || isUnboundedHeight,
+            controller: controller,
+            scrollCacheExtent: scrollCacheExtent,
+            reverse: reverse,
+            primary: primary,
+            children: children);
       },
     );
   }

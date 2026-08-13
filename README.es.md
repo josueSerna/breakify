@@ -35,10 +35,9 @@ Diseñado para funcionar en aplicaciones móviles, tabletas, escritorio y Flutte
 
 <p align="start">
   <i>
-  This demo was recorded using Flutter Web to make responsive behavior easier
-    to visualize. Breakify also works seamlessly on mobile apps and tablets.
+    Demo grabada en Flutter Web para facilitar la visualización del responsive.
+    Breakify también funciona en aplicaciones móviles y tablets
 </p>
-
 ---
 
 ## Características
