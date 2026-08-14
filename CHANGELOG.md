@@ -16,6 +16,7 @@
   correctly resolved as width / height regardless of scroll direction.
 - New README with explanatory images for each breakpoint, plus a Spanish
   translation (`README.es.md`).
+- New, complete example app covering all widgets, including horizontal scrolling for BreakifyGrid and BreakifyListView.
 - All existing functionality is preserved; the new options are opt-in
   and do not change the default behavior of existing widgets.
 
