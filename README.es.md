@@ -473,23 +473,23 @@ redimensionada en cada breakpoint.
 <table align="center">
   <tr>
     <td align="center">
-      <img src="assets/breakpoint_sm.png" width="160" alt="Vista previa breakpoint sm"><br>
+      <img src="assets/breakpoint_sm.jpg" width="160" alt="Vista previa breakpoint sm"><br>
       <sub><b>sm</b> · teléfono</sub>
     </td>
     <td align="center">
-      <img src="assets/breakpoint_md.png" width="160" alt="Vista previa breakpoint md"><br>
+      <img src="assets/breakpoint_md.jpg" width="160" alt="Vista previa breakpoint md"><br>
       <sub><b>md</b> · teléfono grande / tablet pequeña</sub>
     </td>
     <td align="center">
-      <img src="assets/breakpoint_lg.png" width="160" alt="Vista previa breakpoint lg"><br>
+      <img src="assets/breakpoint_lg.jpg" width="160" alt="Vista previa breakpoint lg"><br>
       <sub><b>lg</b> · tablet / laptop pequeña</sub>
     </td>
     <td align="center">
-      <img src="assets/breakpoint_xl.png" width="160" alt="Vista previa breakpoint xl"><br>
+      <img src="assets/breakpoint_xl.jpg" width="160" alt="Vista previa breakpoint xl"><br>
       <sub><b>xl</b> · laptop / escritorio</sub>
     </td>
     <td align="center">
-      <img src="assets/breakpoint_xxl.png" width="160" alt="Vista previa breakpoint xxl"><br>
+      <img src="assets/breakpoint_xxl.jpg" width="160" alt="Vista previa breakpoint xxl"><br>
       <sub><b>xxl</b> · escritorio grande</sub>
     </td>
   </tr>

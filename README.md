@@ -471,23 +471,23 @@ resized across each breakpoint.
 <table align="center">
   <tr>
     <td align="center">
-      <img src="assets/breakpoint_sm.png" width="160" alt="sm breakpoint preview"><br>
+      <img src="assets/breakpoint_sm.jpg" width="160" alt="sm breakpoint preview"><br>
       <sub><b>sm</b> · phone</sub>
     </td>
     <td align="center">
-      <img src="assets/breakpoint_md.png" width="160" alt="md breakpoint preview"><br>
+      <img src="assets/breakpoint_md.jpg" width="160" alt="md breakpoint preview"><br>
       <sub><b>md</b> · large phone / small tablet</sub>
     </td>
     <td align="center">
-      <img src="assets/breakpoint_lg.png" width="160" alt="lg breakpoint preview"><br>
+      <img src="assets/breakpoint_lg.jpg" width="160" alt="lg breakpoint preview"><br>
       <sub><b>lg</b> · tablet / small laptop</sub>
     </td>
     <td align="center">
-      <img src="assets/breakpoint_xl.png" width="160" alt="xl breakpoint preview"><br>
+      <img src="assets/breakpoint_xl.jpg" width="160" alt="xl breakpoint preview"><br>
       <sub><b>xl</b> · laptop / desktop</sub>
     </td>
     <td align="center">
-      <img src="assets/breakpoint_xxl.png" width="160" alt="xxl breakpoint preview"><br>
+      <img src="assets/breakpoint_xxl.jpg" width="160" alt="xxl breakpoint preview"><br>
       <sub><b>xxl</b> · large desktop</sub>
     </td>
   </tr>
