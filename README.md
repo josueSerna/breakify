@@ -1,3 +1,14 @@
+<h1 align="start">Breakify</h1>
+
+<p align="start">
+  <strong>A responsive layout toolkit for Flutter.</strong>
+</p>
+
+<p align="start">
+  Build responsive interfaces using breakpoints, responsive values,
+  fluid interpolation, and adaptive widgets.
+</p>
+
 <p align="center">
   <a href="https://pub.dev/packages/breakify">
     <img src="https://img.shields.io/pub/v/breakify.svg" alt="Pub Version">
@@ -5,51 +16,137 @@
   <a href="https://github.com/josueSerna/breakify">
     <img src="https://img.shields.io/github/stars/josueSerna/breakify?style=social" alt="GitHub Stars">
   </a>
+  <a href="https://pub.dev/packages/breakify">
+    <img src="https://img.shields.io/pub/likes/breakify" alt="Pub Likes">
+  </a>
+  <a href="https://pub.dev/packages/breakify">
+    <img src="https://img.shields.io/pub/points/breakify" alt="Pub Points">
+  </a>
+  <a href="https://github.com/josueSerna/breakify/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT">
+  </a>
+  <img src="https://img.shields.io/badge/flutter-%3E%3D3.0.0-02569B?logo=flutter" alt="Flutter SDK">
 </p>
 
 <p align="center">
-  <img src="assets/breakify_banner.jpeg" width="180" alt="Breakify Logo">
-</p>
-
-<h1 align="center">Breakify</h1>
-
-<p align="center">
-A lightweight responsive layout toolkit for Flutter.
+  <img src="assets/breakify_banner.jpeg" width="400" alt="Breakify">
 </p>
 
 <p align="center">
-Build responsive applications using breakpoints, responsive values,
-and adaptive widgets without scattering screen size checks throughout your code.
-</p>
+    <img src="assets/breakify.gif" width="600" alt="Breakify live resize demo">
+  </p>
 
-<p align="center">
-Designed to work seamlessly on mobile, tablet, desktop, and Flutter Web.
-</p>
 
-<p align="center">
-  <img src="assets/breakify.gif" alt="Breakify Responsive Demo">
-</p>
+---
 
-<p align="center">
-  <i>
-    Demo grabada en Flutter Web para facilitar la visualización del responsive.
-    Breakify también funciona en aplicaciones móviles y tablets
-</p>
+## Table of Contents
+
+- [What is Breakify?](#what-is-breakify)
+- [Why Breakify?](#why-breakify)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Default Breakpoints](#default-breakpoints)
+- [Responsive Values](#responsive-values)
+- [Fluid Values](#fluid-values)
+- [BuildContext Extensions](#buildcontext-extensions)
+- [Widgets](#widgets)
+  - [BreakifyAdaptiveLayout](#breakifyadaptivelayout)
+  - [BreakifyGrid](#breakifygrid)
+  - [BreakifyListView](#breakifylistview)
+  - [BreakifyContainer](#breakifycontainer)
+  - [BreakifyVisibility](#breakifyvisibility)
+  - [BreakifyBuilder](#breakifybuilder)
+  - [BreakifyDebugBanner](#breakifydebugbanner)
+- [Responsive Preview](#responsive-preview)
+- [Example App](#example-app)
+- [Contributing](#contributing)
+- [License](#license)
+- [Author](#author)
+
+---
+
+## What is Breakify?
+
+Breakify is a lightweight responsive layout toolkit for Flutter designed to make responsive UI easier to build and maintain.
+
+Instead of repeatedly checking screen dimensions throughout your widgets:
+
+```dart
+if (MediaQuery.sizeOf(context).width >= 1024) {
+  // ...
+}
+```
+
+Breakify lets you describe **how a value or layout should behave** across screen sizes, and takes care of resolving it for you.
+
+---
+
+## Why Breakify?
+
+Without Breakify, responsive layouts often require manually checking screen sizes throughout your widgets:
+
+```dart
+if (MediaQuery.sizeOf(context).width >= 1024) {
+  ...
+}
+```
+
+or reaching for a `LayoutBuilder` every time:
+
+```dart
+LayoutBuilder(
+  builder: (context, constraints) {
+    // ...
+  },
+)
+```
+
+With Breakify, the same logic becomes declarative:
+
+```dart
+BreakifyAdaptiveLayout(
+  breakpoint: BreakifyBreakpoint.lg,
+  spacing: const BreakifyFluidValue(
+    sm: 12,
+    lg: 24,
+  ),
+  children: [
+    LeftPanel(),
+    RightPanel(),
+  ],
+)
+```
+
+| Without Breakify | With Breakify |
+|---|---|
+| Screen-size checks scattered across widgets | Responsive logic centralized in one value |
+| Manual `LayoutBuilder` boilerplate per widget | Built-in adaptive widgets |
+| Hard breakpoint jumps | Optional fluid interpolation |
+| Easy to forget a breakpoint case | Automatic fallback to the nearest defined value |
+
+The responsive logic stays centralized, making your widgets easier to read, maintain, and reuse.
 
 ---
 
 ## Features
 
 * Responsive breakpoints
-* Responsive values with automatic fallback
 * Fluid values with smooth interpolation
 * Adaptive row/column layouts
 * Responsive containers
-* Responsive grids
-* Responsive list views
+* Responsive grids (including horizontal scroll and equal-height rows)
+* Responsive list views (vertical and horizontal)
 * Conditional visibility by breakpoint
 * Development breakpoint banner
-* Lightweight and dependency-free
+
+---
+
+## Requirements
+
+* Dart SDK `>=3.0.0`
+* Flutter SDK `>=3.0.0`
 
 ---
 
@@ -59,7 +156,7 @@ Add Breakify to your `pubspec.yaml`.
 
 ```yaml
 dependencies:
-  breakify: ^0.1.0
+  breakify: ^0.1.1
 ```
 
 Then import the package.
@@ -70,7 +167,7 @@ import 'package:breakify/breakify.dart';
 
 ---
 
-# Quick Start
+## Quick Start
 
 Wrap your application with `BreakifyScope`.
 
@@ -90,7 +187,7 @@ This makes responsive information available throughout the widget tree.
 
 ---
 
-# Default Breakpoints
+## Default Breakpoints
 
 Breakify includes five responsive breakpoints by default.
 
@@ -121,9 +218,14 @@ BreakifyScope(
 )
 ```
 
+> **Note:** every breakpoint width shown in this README — including the
+> [Responsive Preview](#responsive-preview) below — uses these defaults.
+> Since breakpoints are fully customizable, your own app may switch
+> layouts at different widths.
+
 ---
 
-# Responsive Values
+## Responsive Values
 
 Instead of manually checking the screen width, define how a value should behave.
 
@@ -151,7 +253,7 @@ For example:
 
 ---
 
-# Fluid Values
+## Fluid Values
 
 Need values to scale smoothly instead of changing abruptly?
 
@@ -175,7 +277,7 @@ Instead of jumping from one value to another, Breakify interpolates between brea
 
 ---
 
-# BuildContext Extensions
+## BuildContext Extensions
 
 Breakify provides useful extensions for accessing responsive information.
 
@@ -199,9 +301,9 @@ Resolves any `BreakifyResolvable`.
 
 ---
 
-# Widgets
+## Widgets
 
-## BreakifyAdaptiveLayout
+### BreakifyAdaptiveLayout
 
 Automatically switches between a `Column` and a `Row`.
 
@@ -221,9 +323,9 @@ BreakifyAdaptiveLayout(
 
 ---
 
-## BreakifyGrid
+### BreakifyGrid
 
-Responsive grid with configurable columns.
+Responsive grid with configurable columns, spacing, and aspect ratio.
 
 ```dart
 BreakifyGrid(
@@ -240,11 +342,31 @@ BreakifyGrid(
 )
 ```
 
+It also supports:
+
+* **Horizontal scrolling** — set `scrollDirection: Axis.horizontal` to
+  scroll sideways instead of vertically. In this mode, `columns` controls
+  the number of rows instead of columns, and `childAspectRatio` is still
+  expressed as width / height.
+* **Equal-height rows** — set `equalHeight: true` to make every item in a
+  row match the height of the tallest item in that row. Useful for grids
+  with items of varying intrinsic height. Currently only supported with
+  `Axis.vertical`.
+
+```dart
+BreakifyGrid(
+  columns: const BreakifyValue(sm: 1, md: 2, lg: 3),
+  scrollDirection: Axis.horizontal,
+  spacing: const BreakifyFluidValue(sm: 8, lg: 20),
+  children: cards,
+)
+```
+
 ---
 
-## BreakifyListView
+### BreakifyListView
 
-Responsive list with configurable spacing.
+Responsive list with configurable spacing and separators.
 
 ```dart
 BreakifyListView(
@@ -261,9 +383,12 @@ BreakifyListView(
 )
 ```
 
+Supports a custom `separator` widget (replacing the default spacing) and
+`scrollDirection: Axis.horizontal` for horizontal lists.
+
 ---
 
-## BreakifyContainer
+### BreakifyContainer
 
 Centers content while limiting its maximum width.
 
@@ -278,7 +403,7 @@ BreakifyContainer(
 
 ---
 
-## BreakifyVisibility
+### BreakifyVisibility
 
 Show or hide widgets depending on the current breakpoint.
 
@@ -303,7 +428,7 @@ BreakifyVisibility.only(
 
 ---
 
-## BreakifyBuilder
+### BreakifyBuilder
 
 Build widgets based on the current breakpoint.
 
@@ -319,7 +444,7 @@ BreakifyBuilder(
 
 ---
 
-## BreakifyDebugBanner
+### BreakifyDebugBanner
 
 Displays the current breakpoint during development.
 
@@ -331,47 +456,57 @@ BreakifyDebugBanner(
 
 ---
 
-# Why Breakify?
+## Responsive Preview
 
-Without Breakify, responsive layouts often require manually checking screen sizes throughout your widgets.
+The screenshots below were captured from the app in [`/example`](example),
+resized across each breakpoint.
 
-```dart
-if (MediaQuery.sizeOf(context).width >= 1024) {
-  ...
-}
-```
+> These previews use Breakify's **default** breakpoint widths (see the
+> [Default Breakpoints](#default-breakpoints) table above). Breakpoints are
+> fully customizable via `BreakifyBreakpoints`, so an app using custom
+> values will switch layouts at different widths — the *behavior* shown
+> here (how many columns, how the layout adapts) is what stays consistent,
+> not the exact pixel value.
 
-or
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="assets/breakpoint_sm.png" width="160" alt="sm breakpoint preview"><br>
+      <sub><b>sm</b> · phone</sub>
+    </td>
+    <td align="center">
+      <img src="assets/breakpoint_md.png" width="160" alt="md breakpoint preview"><br>
+      <sub><b>md</b> · large phone / small tablet</sub>
+    </td>
+    <td align="center">
+      <img src="assets/breakpoint_lg.png" width="160" alt="lg breakpoint preview"><br>
+      <sub><b>lg</b> · tablet / small laptop</sub>
+    </td>
+    <td align="center">
+      <img src="assets/breakpoint_xl.png" width="160" alt="xl breakpoint preview"><br>
+      <sub><b>xl</b> · laptop / desktop</sub>
+    </td>
+    <td align="center">
+      <img src="assets/breakpoint_xxl.png" width="160" alt="xxl breakpoint preview"><br>
+      <sub><b>xxl</b> · large desktop</sub>
+    </td>
+  </tr>
+</table>
 
-```dart
-LayoutBuilder(
-  builder: ...
-)
-```
-
-Breakify lets you describe how your UI should behave instead.
-
-```dart
-BreakifyAdaptiveLayout(
-  breakpoint: BreakifyBreakpoint.lg,
-  spacing: const BreakifyFluidValue(
-    sm: 12,
-    lg: 24,
-  ),
-  children: [
-    LeftPanel(),
-    RightPanel(),
-  ],
-)
-```
-
-The responsive logic stays centralized, making your widgets easier to read, maintain, and reuse.
+<!--
+  How to regenerate these screenshots:
+  1. Run the example app: flutter run -d chrome
+  2. Resize the browser window to each default breakpoint width
+     (640, 768, 1024, 1280, 1536) — or a representative width just
+     above each one.
+  3. Capture a screenshot and save it as assets/preview_<breakpoint>.png
+-->
 
 ---
 
-# Example
+## Example App
 
-A complete example application is available in the example folder.
+A complete example application is available in the [`example`](example) folder.
 
 Run the example on Flutter Web:
 
@@ -387,12 +522,12 @@ flutter run
 
 ---
 
-# License
+## License
 
 This project is licensed under the MIT License.
 
-# Author
+## Author
 
-Developed and maintained by Josue Serna.
+Developed and maintained by Josue Serna Muñoz.
 
 GitHub: https://github.com/josueSerna

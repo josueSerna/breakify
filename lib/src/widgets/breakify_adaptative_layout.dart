@@ -61,6 +61,15 @@ class BreakifyAdaptativeLayout extends StatelessWidget {
   /// Otherwise, they are wrapped with [Flexible].
   final bool distributeEvenly;
 
+  /// Whether children should stretch across the available
+  /// horizontal space when the layout is vertical.
+  ///
+  /// When `true`, the [Column] uses
+  /// [CrossAxisAlignment.stretch].
+  ///
+  /// This option has no effect when the layout is horizontal.
+  final bool stretchChildren;
+
   /// Breakpoint configuration used to resolve responsive values.
   ///
   /// If null, the configuration provided by the nearest
@@ -77,6 +86,7 @@ class BreakifyAdaptativeLayout extends StatelessWidget {
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.crossAxisAlignment = CrossAxisAlignment.start,
     this.distributeEvenly = false,
+    this.stretchChildren = false,
     this.breakpoints,
   });
 
@@ -99,7 +109,6 @@ class BreakifyAdaptativeLayout extends StatelessWidget {
                 : Flexible(child: child);
           }).toList();
 
-          // Si usamos stretch y hay altura infinita, envolvemos en IntrinsicHeight
           Widget row = Row(
             mainAxisAlignment: mainAxisAlignment,
             crossAxisAlignment: crossAxisAlignment,
@@ -116,7 +125,9 @@ class BreakifyAdaptativeLayout extends StatelessWidget {
         } else {
           return Column(
             mainAxisAlignment: mainAxisAlignment,
-            crossAxisAlignment: crossAxisAlignment,
+            crossAxisAlignment: stretchChildren
+                ? CrossAxisAlignment.stretch
+                : crossAxisAlignment,
             children: breakifyGapChildren(children, gap, Axis.vertical),
           );
         }

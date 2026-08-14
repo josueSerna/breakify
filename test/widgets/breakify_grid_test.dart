@@ -218,4 +218,56 @@ void main() {
       expect(grid.padding, const EdgeInsets.all(24));
     });
   });
+  testWidgets('does not enable equal height by default', (tester) async {
+    await tester.pumpWidget(
+      createApp(
+        width: 900,
+        child: BreakifyGrid(
+          columns: const BreakifyValue(sm: 2),
+          children: createChildren(4),
+        ),
+      ),
+    );
+
+    expect(find.byType(GridView), findsOneWidget);
+  });
+  testWidgets('uses equal height layout when enabled', (tester) async {
+    await tester.pumpWidget(
+      createApp(
+        width: 900,
+        child: BreakifyGrid(
+          columns: const BreakifyValue(sm: 2),
+          equalHeight: true,
+          children: createChildren(4),
+        ),
+      ),
+    );
+
+    expect(find.byType(GridView), findsNothing);
+  });
+
+  testWidgets('equal height respects responsive columns', (tester) async {
+    await tester.pumpWidget(
+      createApp(
+        width: 1200,
+        child: BreakifyGrid(
+          columns: const BreakifyValue(
+            sm: 2,
+            lg: 4,
+          ),
+          equalHeight: true,
+          children: createChildren(8),
+        ),
+      ),
+    );
+
+    expect(find.byKey(const ValueKey(0)), findsOneWidget);
+    expect(find.byKey(const ValueKey(1)), findsOneWidget);
+    expect(find.byKey(const ValueKey(2)), findsOneWidget);
+    expect(find.byKey(const ValueKey(3)), findsOneWidget);
+    expect(find.byKey(const ValueKey(4)), findsOneWidget);
+    expect(find.byKey(const ValueKey(5)), findsOneWidget);
+    expect(find.byKey(const ValueKey(6)), findsOneWidget);
+    expect(find.byKey(const ValueKey(7)), findsOneWidget);
+  });
 }
