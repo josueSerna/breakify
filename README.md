@@ -528,6 +528,6 @@ This project is licensed under the MIT License.
 
 ## Author
 
-Developed and maintained by Josue Serna.
+Developed and maintained by Josue Serna Muñoz.
 
 GitHub: https://github.com/josueSerna
