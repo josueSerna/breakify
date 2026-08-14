@@ -522,20 +522,6 @@ flutter run
 
 ---
 
-## Contributing
-
-Contributions, issues, and feature requests are welcome!
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/my-feature`)
-3. Commit your changes
-4. Open a pull request
-
-If you're proposing a larger change, please open an issue first to discuss
-what you'd like to change.
-
----
-
 ## License
 
 This project is licensed under the MIT License.

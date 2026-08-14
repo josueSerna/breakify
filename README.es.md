@@ -524,19 +524,6 @@ flutter run
 
 ---
 
-## Contribuir
-
-¡Las contribuciones, issues y solicitudes de features son bienvenidas!
-
-1. Haz un fork del repositorio
-2. Crea una rama de feature (`git checkout -b feature/mi-feature`)
-3. Haz commit de tus cambios
-4. Abre un pull request
-
-Si estás proponiendo un cambio grande, por favor abre primero un issue para discutir qué te gustaría cambiar.
-
----
-
 ## Licencia
 
 Este proyecto está licenciado bajo la Licencia MIT.
