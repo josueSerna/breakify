@@ -1,6 +1,9 @@
 import 'package:breakify/breakify.dart';
+import 'package:example/features/breakify_adaptative_layout/screen/breakify_adaptativ_layout_screen.dart';
 import 'package:example/features/breakify_container/screen/breakify_container_screen.dart';
 import 'package:example/features/breakify_grid/screen/breakify_grid_screen.dart';
+import 'package:example/features/breakify_list_view/screen/breakify_list_view_screen.dart';
+import 'package:example/features/breakify_visibility/screen/breakify_visibility_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/example_card.dart';
@@ -46,6 +49,32 @@ class HomeScreen extends StatelessWidget {
                   'the available space.',
               icon: Icons.grid_view,
               page: BreakifyGridScreen(),
+            ),
+            ExampleCard(
+              title: 'BreakifyAdaptativeLayout',
+              description:
+                  'Automatically switches between a Column and Row '
+                  'based on the current breakpoint.',
+              icon: Icons.view_agenda,
+              page: BreakifyAdaptativLayoutScreen(),
+            ),
+
+            ExampleCard(
+              title: 'BreakifyListView',
+              description:
+                  'Builds a responsive and scrollable list with '
+                  'configurable spacing, separators and scroll direction.',
+              icon: Icons.list,
+              page: BreakifyListViewScreen(),
+            ),
+
+            ExampleCard(
+              title: 'BreakifyVisibility',
+              description:
+                  'Shows or hides widgets based on responsive breakpoints '
+                  'using ranges or specific breakpoint values.',
+              icon: Icons.visibility,
+              page: BreakifyVisibilityScreen(),
             ),
           ],
         ),

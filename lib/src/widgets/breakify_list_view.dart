@@ -120,7 +120,9 @@ class BreakifyListView extends StatelessWidget {
             ) ??
             0;
 
-        final isUnboundedHeight = constraints.maxHeight.isInfinite;
+        final isUnboundedMainAxis = scrollDirection == Axis.vertical
+            ? constraints.maxHeight.isInfinite
+            : constraints.maxWidth.isInfinite;
 
         return ListView.separated(
           scrollDirection: scrollDirection,
@@ -129,8 +131,10 @@ class BreakifyListView extends StatelessWidget {
           primary: primary,
           padding: padding,
           physics: physics ??
-              (isUnboundedHeight ? const NeverScrollableScrollPhysics() : null),
-          shrinkWrap: shrinkWrap || isUnboundedHeight,
+              (isUnboundedMainAxis
+                  ? const NeverScrollableScrollPhysics()
+                  : null),
+          shrinkWrap: shrinkWrap || isUnboundedMainAxis,
           scrollCacheExtent: scrollCacheExtent,
           itemCount: itemCount,
           itemBuilder: itemBuilder,

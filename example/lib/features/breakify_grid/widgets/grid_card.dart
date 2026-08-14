@@ -9,11 +9,9 @@ class GridCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Center(
-        child: Center(
-          child: Text(
-            'Item ${index.toString().padLeft(2, '0')}',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+        child: Text(
+          'Item ${index.toString().padLeft(2, '0')}',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
     );

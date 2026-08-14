@@ -171,11 +171,20 @@ class BreakifyGrid extends StatelessWidget {
             ) ??
             spacingValue ??
             0;
-        final isUnboundedHeight = constraints.maxHeight.isInfinite;
+        final isUnboundedMainAxis = scrollDirection == Axis.vertical
+            ? constraints.maxHeight.isInfinite
+            : constraints.maxWidth.isInfinite;
 
         if (!equalHeight) {
-          final aspectRatio =
-              childAspectRatio.resolve(breakpoint, width, effectiveBreakpoints);
+          final resolvedAspectRatio = childAspectRatio.resolve(
+            breakpoint,
+            width,
+            effectiveBreakpoints,
+          );
+
+          final effectiveAspectRatio = scrollDirection == Axis.horizontal
+              ? 1 / resolvedAspectRatio
+              : resolvedAspectRatio;
 
           return GridView.builder(
             scrollDirection: scrollDirection,
@@ -185,15 +194,15 @@ class BreakifyGrid extends StatelessWidget {
             primary: primary,
             padding: padding,
             physics: physics ??
-                (isUnboundedHeight
+                (isUnboundedMainAxis
                     ? const NeverScrollableScrollPhysics()
                     : null),
-            shrinkWrap: shrinkWrap || isUnboundedHeight,
+            shrinkWrap: shrinkWrap || isUnboundedMainAxis,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount,
               crossAxisSpacing: crossSpacing,
               mainAxisSpacing: mainSpacing,
-              childAspectRatio: aspectRatio,
+              childAspectRatio: effectiveAspectRatio,
             ),
             itemCount: children.length,
             itemBuilder: (context, index) => children[index],
@@ -206,10 +215,10 @@ class BreakifyGrid extends StatelessWidget {
             mainSpacing: mainSpacing,
             padding: padding,
             physics: physics ??
-                (isUnboundedHeight
+                (isUnboundedMainAxis
                     ? const NeverScrollableScrollPhysics()
                     : null),
-            shrinkWrap: shrinkWrap || isUnboundedHeight,
+            shrinkWrap: shrinkWrap || isUnboundedMainAxis,
             controller: controller,
             scrollCacheExtent: scrollCacheExtent,
             reverse: reverse,
