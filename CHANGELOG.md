@@ -1,3 +1,13 @@
+# 0.2.0
+
+- Added `BreakifyPanelLayout` for responsive main-and-secondary panel layouts.
+- Added `BreakifyResponsiveGrid` for automatic column calculation based on
+  available width, including a finite fallback for unbounded width.
+- Added local and global visibility modes to `BreakifyVisibility`.
+- Expanded the example app and widget test coverage for the new functionality.
+- Expanded the English and Spanish documentation with the new APIs, layout
+  behavior, responsive modes, and configuration details.
+
 ## 0.1.1
 
 - `BreakifyAdaptativeLayout`: added `stretchChildren`, which stretches

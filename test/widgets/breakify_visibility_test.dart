@@ -147,5 +147,74 @@ void main() {
         expect(find.text('Visible'), findsNothing);
       },
     );
+
+    testWidgets(
+      'global mode uses the scope width',
+      (tester) async {
+        await pumpWithSize(
+          tester,
+          size: const Size(1400, 800),
+          child: Align(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                minWidth: 700,
+                maxWidth: 700,
+              ),
+              child: BreakifyVisibility(
+                minBreakpoint: BreakifyBreakpoint.lg,
+                mode: BreakifyVisibilityMode.global,
+                child: Text('Global'),
+              ),
+            ),
+          ),
+        );
+
+        expect(find.text('Global'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'local mode uses the available width',
+      (tester) async {
+        await pumpWithSize(
+          tester,
+          size: const Size(1400, 800),
+          child: Align(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                minWidth: 700,
+                maxWidth: 700,
+              ),
+              child: const BreakifyVisibility(
+                minBreakpoint: BreakifyBreakpoint.lg,
+                mode: BreakifyVisibilityMode.local,
+                child: Text('Local'),
+              ),
+            ),
+          ),
+        );
+
+        expect(find.text('Local'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'local mode falls back to the scope width when unbounded',
+      (tester) async {
+        await pumpWithSize(
+          tester,
+          size: const Size(1400, 800),
+          child: const UnconstrainedBox(
+            child: BreakifyVisibility(
+              minBreakpoint: BreakifyBreakpoint.lg,
+              mode: BreakifyVisibilityMode.local,
+              child: Text('Fallback'),
+            ),
+          ),
+        );
+
+        expect(find.text('Fallback'), findsOneWidget);
+      },
+    );
   });
 }
