@@ -20,4 +20,6 @@ export 'src/widgets/breakify_container.dart';
 export 'src/widgets/breakify_debug_banner.dart';
 export 'src/widgets/breakify_grid.dart';
 export 'src/widgets/breakify_list_view.dart';
+export 'src/widgets/breakify_panel_layout.dart';
+export 'src/widgets/breakify_responsive_grid.dart';
 export 'src/widgets/breakify_visibility.dart';

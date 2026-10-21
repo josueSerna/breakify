@@ -3,29 +3,45 @@ import 'package:flutter/widgets.dart';
 import '../breakpoints/breakify_breakpoints.dart';
 import '../scope/breakify_scope.dart';
 
+/// Defines how BreakifyVisibility determines the active breakpoint.
+enum BreakifyVisibilityMode {
+  /// Uses the width provided by the nearest BreakifyScope.
+  ///
+  /// This preserves the traditional BreakifyVisibility behavior.
+  global,
+
+  /// Uses the width available to this widget.
+  ///
+  /// If the local width is unbounded, falls back to the global width.
+  local,
+}
+
 /// Shows or hides its child based on the current breakpoint.
 ///
-/// By default, works in a mobile-first way: use [minBreakpoint] to show
-/// the child only from a certain breakpoint upward (inclusive), or
-/// [maxBreakpoint] to show it only up to a certain breakpoint (inclusive).
-/// Combine both to define a range.
+/// By default, visibility is resolved using the global width provided
+/// by [BreakifyScope]. Set [mode] to [BreakifyVisibilityMode.local]
+/// to use the width available to this widget instead.
+///
+/// Use [minBreakpoint] to show the child from a breakpoint upward,
+/// or [maxBreakpoint] to show it up to a breakpoint. Both can be
+/// combined to define a range.
 ///
 /// ```dart
-/// // Shown only from `lg` upward (lg, xl, xxl)
+/// // Visible from lg upward, using the global screen width.
 /// BreakifyVisibility(
 ///   minBreakpoint: BreakifyBreakpoint.lg,
 ///   child: Sidebar(),
 /// )
 ///
-/// // Shown only on `sm` and `md`
+/// // Visible from lg upward, using the local available width.
 /// BreakifyVisibility(
-///   maxBreakpoint: BreakifyBreakpoint.md,
-///   child: MobileNavBar(),
+///   minBreakpoint: BreakifyBreakpoint.lg,
+///   mode: BreakifyVisibilityMode.local,
+///   child: Sidebar(),
 /// )
 /// ```
 ///
-/// For non-contiguous breakpoints (e.g. visible only on `sm` and `xl`,
-/// but hidden on everything in between), use [visibleIn] instead:
+/// For non-contiguous breakpoints, use [BreakifyVisibility.only]:
 ///
 /// ```dart
 /// BreakifyVisibility.only(
@@ -34,20 +50,17 @@ import '../scope/breakify_scope.dart';
 /// )
 /// ```
 ///
-/// When hidden, the child is not built at all (no space is reserved,
-/// no state is preserved). If you need to preserve state or reserve
-/// layout space while hidden, wrap the child yourself with [Visibility]
-/// or [Offstage] instead.
+/// When hidden, the child is not built and no space is reserved.
+/// Use Flutter's [Visibility] if you need to preserve state or layout space.
 ///
-/// Requires a [BreakifyScope] ancestor unless [breakpoints] is
-/// explicitly provided.
+/// Requires a [BreakifyScope] ancestor unless [breakpoints] is provided.
 class BreakifyVisibility extends StatelessWidget {
   /// Widget displayed when the current breakpoint is visible.
   final Widget child;
 
   /// Widget displayed when the child is hidden.
   ///
-  /// If null, an empty widget (`SizedBox.shrink`) is rendered instead.
+  /// If null, an empty widget is rendered instead.
   final Widget? replacement;
 
   /// Lowest breakpoint (inclusive) where the child is visible.
@@ -60,18 +73,21 @@ class BreakifyVisibility extends StatelessWidget {
   /// Ignored when [visibleIn] is provided.
   final BreakifyBreakpoint? maxBreakpoint;
 
-  /// Explicit list of breakpoints where the child is visible.
-  ///
-  /// This is useful when visibility does not follow a continuous range,
-  /// for example showing the widget only on `sm` and `xl`.
+  /// Explicit breakpoints where the child is visible.
   ///
   /// When provided, [minBreakpoint] and [maxBreakpoint] are ignored.
   final Set<BreakifyBreakpoint>? visibleIn;
 
-  /// Breakpoint configuration used to determine the current breakpoint.
+  /// Breakpoint configuration used to determine visibility.
   ///
   /// If null, the nearest [BreakifyScope] configuration is used.
   final BreakifyBreakpoints? breakpoints;
+
+  /// Determines whether visibility uses global or local width.
+  ///
+  /// Defaults to [BreakifyVisibilityMode.global] to preserve
+  /// the existing behavior.
+  final BreakifyVisibilityMode mode;
 
   /// Creates a visibility widget using a breakpoint range.
   const BreakifyVisibility({
@@ -81,35 +97,57 @@ class BreakifyVisibility extends StatelessWidget {
     this.minBreakpoint,
     this.maxBreakpoint,
     this.breakpoints,
+    this.mode = BreakifyVisibilityMode.global,
   }) : visibleIn = null;
 
   /// Creates a visibility widget using explicit breakpoints.
-  ///
-  /// This constructor is useful when visibility cannot be represented
-  /// by a continuous breakpoint range.
   const BreakifyVisibility.only({
     super.key,
     required this.child,
     required Set<BreakifyBreakpoint> this.visibleIn,
     this.replacement,
     this.breakpoints,
+    this.mode = BreakifyVisibilityMode.global,
   })  : minBreakpoint = null,
         maxBreakpoint = null;
 
   @override
   Widget build(BuildContext context) {
     final effectiveBreakpoints = breakpoints ?? context.breakifyBreakpoints;
-    final width = context.breakifyWidth;
-    final breakpoint = effectiveBreakpoints.resolve(width);
+    final globalWidth = context.breakifyWidth;
 
+    if (mode == BreakifyVisibilityMode.global) {
+      return _buildForWidth(
+        globalWidth,
+        effectiveBreakpoints,
+      );
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final localWidth =
+            constraints.maxWidth.isFinite ? constraints.maxWidth : globalWidth;
+
+        return _buildForWidth(
+          localWidth,
+          effectiveBreakpoints,
+        );
+      },
+    );
+  }
+
+  Widget _buildForWidth(
+    double width,
+    BreakifyBreakpoints effectiveBreakpoints,
+  ) {
+    final breakpoint = effectiveBreakpoints.resolve(width);
     final isVisible = _resolveVisibility(breakpoint);
 
     if (isVisible) return child;
+
     return replacement ?? const SizedBox.shrink();
   }
 
-  /// Returns whether the widget should be visible for the
-  /// current breakpoint.
   bool _resolveVisibility(BreakifyBreakpoint breakpoint) {
     if (visibleIn != null) {
       return visibleIn!.contains(breakpoint);

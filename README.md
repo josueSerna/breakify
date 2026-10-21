@@ -25,7 +25,7 @@
   <a href="https://github.com/josueSerna/breakify/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT">
   </a>
-  <img src="https://img.shields.io/badge/flutter-%3E%3D3.0.0-02569B?logo=flutter" alt="Flutter SDK">
+  <img src="https://img.shields.io/badge/flutter-%3E%3D3.10.0-02569B?logo=flutter" alt="Flutter SDK">
 </p>
 
 <p align="center">
@@ -52,8 +52,10 @@
 - [Fluid Values](#fluid-values)
 - [BuildContext Extensions](#buildcontext-extensions)
 - [Widgets](#widgets)
-  - [BreakifyAdaptiveLayout](#breakifyadaptivelayout)
+  - [BreakifyAdaptativeLayout](#breakifyadaptativelayout)
   - [BreakifyGrid](#breakifygrid)
+  - [BreakifyResponsiveGrid](#breakifyresponsivegrid)
+  - [BreakifyPanelLayout](#breakifypanellayout)
   - [BreakifyListView](#breakifylistview)
   - [BreakifyContainer](#breakifycontainer)
   - [BreakifyVisibility](#breakifyvisibility)
@@ -106,7 +108,7 @@ LayoutBuilder(
 With Breakify, the same logic becomes declarative:
 
 ```dart
-BreakifyAdaptiveLayout(
+BreakifyAdaptativeLayout(
   breakpoint: BreakifyBreakpoint.lg,
   spacing: const BreakifyFluidValue(
     sm: 12,
@@ -136,17 +138,19 @@ The responsive logic stays centralized, making your widgets easier to read, main
 * Fluid values with smooth interpolation
 * Adaptive row/column layouts
 * Responsive containers
-* Responsive grids (including horizontal scroll and equal-height rows)
+* Responsive grids, including explicit and automatic column layouts
+* Horizontal grids and equal-height rows
 * Responsive list views (vertical and horizontal)
-* Conditional visibility by breakpoint
-* Development breakpoint banner
+* Main-and-secondary panel layouts
+* Conditional visibility by breakpoint, globally or locally
+* Development breakpoint banner with configurable position
 
 ---
 
 ## Requirements
 
 * Dart SDK `>=3.0.0`
-* Flutter SDK `>=3.0.0`
+* Flutter SDK `>=3.10.0`
 
 ---
 
@@ -156,7 +160,7 @@ Add Breakify to your `pubspec.yaml`.
 
 ```yaml
 dependencies:
-  breakify: ^0.1.1
+  breakify: ^0.2.0
 ```
 
 Then import the package.
@@ -259,7 +263,11 @@ Need values to scale smoothly instead of changing abruptly?
 
 Use `BreakifyFluidValue`.
 
-```dart
+```
+
+`BreakifyValue` is generic, so it can resolve values such as `int`, `double`,
+`EdgeInsets`, or other types used by responsive widgets. The `sm` value is
+required; higher breakpoints inherit the closest value defined before them.dart
 const spacing = BreakifyFluidValue(
   sm: 8,
   md: 16,
@@ -275,6 +283,13 @@ Container(
 
 Instead of jumping from one value to another, Breakify interpolates between breakpoints.
 
+Interpolation is linear between each pair of defined breakpoint values. Values
+before the first defined point use the first value, and values after the last
+defined point use the last value. If a different breakpoint configuration is
+needed for one fluid value, use `overrideBreakpoints`. Use
+`resolveRounded` when the interpolated result should be rounded to the nearest
+logical pixel.
+
 ---
 
 ## BuildContext Extensions
@@ -286,6 +301,10 @@ context.breakpoint
 ```
 
 Returns the current breakpoint.
+
+For widgets using `BreakifyScope`, this is the breakpoint resolved from the
+scope's width. Widgets that use `BreakifyBuilder` resolve their breakpoint from
+the width in their local `BoxConstraints`.
 
 ```dart
 context.breakifyWidth
@@ -303,12 +322,12 @@ Resolves any `BreakifyResolvable`.
 
 ## Widgets
 
-### BreakifyAdaptiveLayout
+### BreakifyAdaptativeLayout
 
 Automatically switches between a `Column` and a `Row`.
 
 ```dart
-BreakifyAdaptiveLayout(
+BreakifyAdaptativeLayout(
   breakpoint: BreakifyBreakpoint.lg,
   spacing: const BreakifyValue(
     sm: 12,
@@ -320,6 +339,11 @@ BreakifyAdaptiveLayout(
   ],
 )
 ```
+
+`distributeEvenly` controls whether horizontal children use `Expanded`
+(`true`) or `Flexible` (`false`). `stretchChildren` applies
+`CrossAxisAlignment.stretch` to the vertical layout. Spacing can be a
+`BreakifyValue` or a `BreakifyFluidValue`.
 
 ---
 
@@ -342,6 +366,12 @@ BreakifyGrid(
 )
 ```
 
+`columns`, `spacing`, `crossAxisSpacing`, `mainAxisSpacing`, and
+`childAspectRatio` support responsive values. When both `spacing` and an axis
+specific spacing are provided, the axis-specific value takes precedence.
+`padding`, `physics`, `shrinkWrap`, and `scrollDirection` are forwarded to the
+underlying scrollable grid.
+
 It also supports:
 
 * **Horizontal scrolling** — set `scrollDirection: Axis.horizontal` to
@@ -361,6 +391,58 @@ BreakifyGrid(
   children: cards,
 )
 ```
+
+---
+
+### BreakifyResponsiveGrid
+
+Automatically calculates how many columns fit while keeping a minimum item
+width.
+
+```dart
+BreakifyResponsiveGrid(
+  minItemWidth: 240,
+  maxColumns: 4,
+  spacing: 16,
+  children: products,
+)
+```
+
+When the parent provides an unbounded width, the grid uses `minItemWidth` as
+its finite fallback width.
+
+The column count is calculated from the available width after horizontal
+padding and the space required between items. `maxColumns` caps the result,
+while at least one column is always used. Unlike `BreakifyGrid`, this widget
+does not require a value for each breakpoint and responds to the local width
+provided by its parent.
+
+---
+
+### BreakifyPanelLayout
+
+Places a main panel beside a vertical stack of secondary panels from the
+selected breakpoint onward.
+
+```dart
+BreakifyPanelLayout(
+  breakpoint: BreakifyBreakpoint.lg,
+  spacing: const BreakifyFluidValue(sm: 12, lg: 24),
+  mainPanel: MainContent(),
+  secondaryPanels: [
+    SummaryCard(),
+    ActionsCard(),
+  ],
+)
+```
+
+Below the breakpoint, all panels are arranged vertically. At the breakpoint,
+the main panel and the secondary panel column are arranged horizontally.
+
+`mainFlex` and `secondaryFlex` control the horizontal width ratio. If
+`secondaryPanels` is empty, the layout remains vertical. The breakpoint is
+resolved from the layout's available local width, so padding or parent
+constraints can make it differ from the global screen breakpoint.
 
 ---
 
@@ -386,6 +468,11 @@ BreakifyListView(
 Supports a custom `separator` widget (replacing the default spacing) and
 `scrollDirection: Axis.horizontal` for horizontal lists.
 
+When `separator` is provided, it replaces the responsive spacing between
+items. Use `shrinkWrap` and appropriate scroll physics when placing the list
+inside another scrollable widget. Horizontal spacing is applied along the
+horizontal axis.
+
 ---
 
 ### BreakifyContainer
@@ -400,6 +487,9 @@ BreakifyContainer(
   child: content,
 )
 ```
+
+`maxWidth` and `padding` support `BreakifyValue` and `BreakifyFluidValue`.
+`margin` and `alignment` use Flutter's regular layout types.
 
 ---
 
@@ -426,6 +516,28 @@ BreakifyVisibility.only(
 )
 ```
 
+Use `mode: BreakifyVisibilityMode.local` to resolve visibility from the
+width available to the widget instead of the global `BreakifyScope` width.
+
+The default mode is `BreakifyVisibilityMode.global`. Use `minBreakpoint` to
+show a child from a breakpoint upward, `maxBreakpoint` to show it up to a
+breakpoint, or combine both to define an inclusive range. `replacement` is
+rendered while the child is hidden; if it is omitted, the widget uses an
+empty `SizedBox`.
+
+```dart
+BreakifyVisibility(
+  minBreakpoint: BreakifyBreakpoint.lg,
+  mode: BreakifyVisibilityMode.local,
+  replacement: MobileMenu(),
+  child: DesktopSidebar(),
+)
+```
+
+`global` uses the width exposed by `BreakifyScope`; `local` uses the finite
+width available where the widget is placed. If the local width is unbounded,
+it falls back to the global width.
+
 ---
 
 ### BreakifyBuilder
@@ -442,6 +554,10 @@ BreakifyBuilder(
 )
 ```
 
+The builder receives the current `BuildContext`, the resolved
+`BreakifyBreakpoint`, and the local `BoxConstraints`. It is useful when a
+layout needs custom behavior that is not covered by the built-in widgets.
+
 ---
 
 ### BreakifyDebugBanner
@@ -450,6 +566,19 @@ Displays the current breakpoint during development.
 
 ```dart
 BreakifyDebugBanner(
+  child: MyApp(),
+)
+```
+
+Use `enabled` to hide the banner without removing it from the tree,
+`corner` to select one of the four screen corners, and `breakpoints` to use a
+custom configuration. This widget is intended for development and should
+usually be disabled in production.
+
+```dart
+BreakifyDebugBanner(
+  enabled: true,
+  corner: BreakifyBannerCorner.bottomLeft,
   child: MyApp(),
 )
 ```
