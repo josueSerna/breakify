@@ -17,6 +17,12 @@ class BreakifyExampleApp extends StatelessWidget {
         title: 'Flexify Example',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.indigo),
+        builder: (context, child) {
+          return BreakifyDebugBanner(
+            corner: BreakifyBannerCorner.topRight,
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
         home: HomeScreen(),
       ),
     );

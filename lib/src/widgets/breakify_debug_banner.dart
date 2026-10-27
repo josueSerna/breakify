@@ -28,6 +28,12 @@ enum BreakifyBannerCorner {
 /// The banner can be positioned in any corner of the screen and
 /// can be enabled or disabled without removing it from the widget tree.
 ///
+/// The breakpoint and width are resolved from the local constraints received
+/// by this widget. This makes the banner useful inside a constrained
+/// container, where its breakpoint can differ from the global screen
+/// breakpoint. If the local width is unbounded, the scope width is used as a
+/// fallback.
+///
 /// This widget should typically be excluded from production builds.
 ///
 /// Requires a [BreakifyScope] ancestor unless a custom
@@ -64,27 +70,34 @@ class BreakifyDebugBanner extends StatelessWidget {
     if (!enabled) return child;
 
     final effectiveBreakpoints = breakpoints ?? context.breakifyBreakpoints;
-    final width = context.breakifyWidth;
-    final breakpoint = effectiveBreakpoints.resolve(width);
 
-    return Stack(
-      children: [
-        child,
-        Positioned(
-          top: _isTop ? 0 : null,
-          bottom: _isTop ? null : 0,
-          left: _isLeft ? 0 : null,
-          right: _isLeft ? null : 0,
-          child: IgnorePointer(
-            child: SafeArea(
-              child: _Banner(
-                breakpoint: breakpoint,
-                width: width,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : context.breakifyWidth;
+        final breakpoint = effectiveBreakpoints.resolve(width);
+
+        return Stack(
+          children: [
+            child,
+            Positioned(
+              top: _isTop ? 0 : null,
+              bottom: _isTop ? null : 0,
+              left: _isLeft ? 0 : null,
+              right: _isLeft ? null : 0,
+              child: IgnorePointer(
+                child: SafeArea(
+                  child: _Banner(
+                    breakpoint: breakpoint,
+                    width: width,
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 

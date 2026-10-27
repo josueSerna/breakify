@@ -1,3 +1,18 @@
+# 0.2.1
+
+- Fixed breakpoint resolution so each configured breakpoint is active at its
+  exact minimum width, including custom configurations.
+- Improved `BreakifyResponsiveGrid` documentation and coverage for automatic
+  local-width column calculation, spacing, limits, and unbounded constraints.
+- Added opt-in `equalHeight` support to `BreakifyResponsiveGrid`, reusing the
+  existing equal-height row layout.
+- Added the new Breakify logo and Brix mascot assets to the project identity.
+- Updated `BreakifyDebugBanner` to resolve its breakpoint from local layout
+  constraints, with a global-width fallback for unbounded layouts.
+- Added new UI elements and improved the example application to provide a more
+  complete demonstration of Breakify's features.
+
+
 # 0.2.0
 
 - Added `BreakifyPanelLayout` for responsive main-and-secondary panel layouts.

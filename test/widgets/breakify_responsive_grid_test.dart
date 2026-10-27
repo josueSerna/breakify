@@ -47,6 +47,25 @@ void main() {
   }
 
   group('BreakifyResponsiveGrid', () {
+    testWidgets('handles an empty list', (tester) async {
+      await tester.pumpWidget(
+        const Directionality(
+          textDirection: TextDirection.ltr,
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              width: 500,
+              height: 600,
+              child: BreakifyResponsiveGrid(children: []),
+            ),
+          ),
+        ),
+      );
+
+      expect(getColumnCount(tester), 2);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets(
       'uses a finite fallback width when available width is infinite',
       (tester) async {
@@ -125,6 +144,94 @@ void main() {
         );
 
         expect(getColumnCount(tester), 1);
+      },
+    );
+
+    testWidgets(
+      'recalculates columns from local width constraints',
+      (tester) async {
+        await tester.pumpWidget(
+          const Directionality(
+            textDirection: TextDirection.ltr,
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                width: 500,
+                height: 600,
+                child: BreakifyResponsiveGrid(
+                  minItemWidth: 200,
+                  spacing: 16,
+                  children: [
+                    Text('One'),
+                    Text('Two'),
+                    Text('Three'),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+
+        expect(getColumnCount(tester), 2);
+
+        await tester.pumpWidget(
+          const Directionality(
+            textDirection: TextDirection.ltr,
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                width: 700,
+                height: 600,
+                child: BreakifyResponsiveGrid(
+                  minItemWidth: 200,
+                  spacing: 16,
+                  children: [
+                    Text('One'),
+                    Text('Two'),
+                    Text('Three'),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+
+        expect(getColumnCount(tester), 3);
+      },
+    );
+
+    testWidgets(
+      'equalHeight matches items within a row',
+      (tester) async {
+        await tester.pumpWidget(
+          const Directionality(
+            textDirection: TextDirection.ltr,
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                width: 500,
+                height: 600,
+                child: BreakifyResponsiveGrid(
+                  minItemWidth: 200,
+                  spacing: 16,
+                  equalHeight: true,
+                  shrinkWrap: true,
+                  children: [
+                    Text('Short'),
+                    Text('Long content\nwith more lines'),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+
+        expect(find.byType(GridView), findsNothing);
+        expect(
+          tester.getSize(find.text('Short')).height,
+          tester.getSize(find.text('Long content\nwith more lines')).height,
+        );
+        expect(tester.takeException(), isNull);
       },
     );
   });
