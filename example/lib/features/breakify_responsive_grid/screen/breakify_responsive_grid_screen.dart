@@ -1,4 +1,5 @@
 import 'package:breakify/breakify.dart';
+import 'package:example/features/breakify_grid/widgets/demo_card.dart';
 import 'package:example/features/breakify_grid/widgets/grid_card.dart';
 import 'package:flutter/material.dart';
 
@@ -42,6 +43,40 @@ class BreakifyResponsiveGridScreen extends StatelessWidget {
               8,
               (index) => GridCard(index: index),
             ),
+          ),
+          const SizedBox(height: 32),
+          const Text(
+            'Equal-height rows',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Enable equalHeight to match cards within each row to the '
+            'tallest card while preserving automatic columns.',
+          ),
+          const SizedBox(height: 16),
+          BreakifyResponsiveGrid(
+            minItemWidth: 180,
+            maxColumns: 3,
+            spacing: 16,
+            equalHeight: true,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: const [
+              DemoCard(
+                title: 'Short card',
+                description: 'A short description.',
+              ),
+              DemoCard(
+                title: 'Long card',
+                description: 'This card contains more content and determines '
+                    'the height of its row.',
+              ),
+              DemoCard(
+                title: 'Another card',
+                description: 'Cards reflow as the local width changes.',
+              ),
+            ],
           ),
           const SizedBox(height: 32),
           const Text(

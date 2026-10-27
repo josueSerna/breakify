@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <img src="assets/breakify_banner.jpeg" width="400" alt="Breakify">
+  <img src="assets/brix_with_breakify_logo.png" width="400" alt="Breakify">
 </p>
 
 <p align="center">
@@ -160,7 +160,7 @@ Add Breakify to your `pubspec.yaml`.
 
 ```yaml
 dependencies:
-  breakify: ^0.2.0
+  breakify: ^0.2.1
 ```
 
 Then import the package.
@@ -203,7 +203,7 @@ Breakify includes five responsive breakpoints by default.
 | xl         |          1280 |
 | xxl        |          1536 |
 
-You can also provide your own breakpoint configuration.
+You can also define your own breakpoint configuration to adapt layouts to the needs of your project.
 
 ```dart
 const breakpoints = BreakifyBreakpoints(
@@ -226,6 +226,9 @@ BreakifyScope(
 > [Responsive Preview](#responsive-preview) below — uses these defaults.
 > Since breakpoints are fully customizable, your own app may switch
 > layouts at different widths.
+
+Each breakpoint becomes active at its configured minimum width, including the
+exact threshold. For example, with `xl: 1400`, `xl` resolves from 1400 pixels.
 
 ---
 
@@ -392,8 +395,6 @@ BreakifyGrid(
 )
 ```
 
----
-
 ### BreakifyResponsiveGrid
 
 Automatically calculates how many columns fit while keeping a minimum item
@@ -408,6 +409,12 @@ BreakifyResponsiveGrid(
 )
 ```
 
+Unlike `BreakifyGrid`, which uses an explicit responsive column count,
+`BreakifyResponsiveGrid` calculates the column count from the local width
+provided by its parent. `minItemWidth` is the minimum desired width for each
+item, `maxColumns` optionally caps the calculated count, and `spacing` is
+included in the calculation between columns.
+
 When the parent provides an unbounded width, the grid uses `minItemWidth` as
 its finite fallback width.
 
@@ -416,6 +423,23 @@ padding and the space required between items. `maxColumns` caps the result,
 while at least one column is always used. Unlike `BreakifyGrid`, this widget
 does not require a value for each breakpoint and responds to the local width
 provided by its parent.
+
+Set `equalHeight: true` to make items in each row match the height of the
+tallest item in that row. This is opt-in, ignores `childAspectRatio`, and
+sizes rows from their content without imposing a fixed height.
+
+```dart
+BreakifyResponsiveGrid(
+  minItemWidth: 220,
+  maxColumns: 3,
+  spacing: 16,
+  equalHeight: true,
+  children: [
+    Card(child: Text('Short content')),
+    Card(child: Text('Content that needs more vertical space.')),
+  ],
+)
+```
 
 ---
 
@@ -574,6 +598,16 @@ Use `enabled` to hide the banner without removing it from the tree,
 `corner` to select one of the four screen corners, and `breakpoints` to use a
 custom configuration. This widget is intended for development and should
 usually be disabled in production.
+
+The banner resolves its breakpoint from its local width. When placed inside a
+constrained container, it shows that container's breakpoint instead of the
+global screen breakpoint. If the local width is unbounded, it falls back to
+the width provided by `BreakifyScope`.
+
+In the example app, the banner added through `MaterialApp.builder` represents
+the global route/window view and appears on every example screen. The home
+screen also includes a banner inside a constrained 720 px container so you
+can compare the global and local breakpoints while resizing the window.
 
 ```dart
 BreakifyDebugBanner(

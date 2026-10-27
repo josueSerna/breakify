@@ -112,6 +112,36 @@ void main() {
       expect(find.text('xl · 1400px'), findsOneWidget);
     });
 
+    testWidgets('uses the local width inside a constrained container',
+        (tester) async {
+      await tester.binding.setSurfaceSize(
+        const Size(1400, 800),
+      );
+
+      addTearDown(() {
+        tester.binding.setSurfaceSize(null);
+      });
+
+      await tester.pumpWidget(
+        createApp(
+          width: 1400,
+          child: const Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              width: 900,
+              height: 800,
+              child: BreakifyDebugBanner(
+                child: Text('Content'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('md · 900px'), findsOneWidget);
+      expect(find.text('xl · 1400px'), findsNothing);
+    });
+
     testWidgets('supports topLeft corner', (tester) async {
       await tester.binding.setSurfaceSize(
         const Size(1024, 800),

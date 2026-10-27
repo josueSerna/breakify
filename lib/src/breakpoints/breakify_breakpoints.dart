@@ -82,11 +82,23 @@ class BreakifyBreakpoints {
   /// // BreakifyBreakpoint.md
   /// ```
   BreakifyBreakpoint resolve(double width) {
-    if (width >= xxl) return BreakifyBreakpoint.xxl;
-    if (width >= xl) return BreakifyBreakpoint.xl;
-    if (width >= lg) return BreakifyBreakpoint.lg;
-    if (width >= md) return BreakifyBreakpoint.md;
-    return BreakifyBreakpoint.sm;
+    final thresholds = <(BreakifyBreakpoint, double)>[
+      (BreakifyBreakpoint.sm, sm),
+      (BreakifyBreakpoint.md, md),
+      (BreakifyBreakpoint.lg, lg),
+      (BreakifyBreakpoint.xl, xl),
+      (BreakifyBreakpoint.xxl, xxl),
+    ];
+
+    var resolved = BreakifyBreakpoint.sm;
+    for (final (breakpoint, threshold) in thresholds) {
+      if (width < threshold) {
+        break;
+      }
+      resolved = breakpoint;
+    }
+
+    return resolved;
   }
 
   /// Returns the minimum width associated with the given breakpoint.

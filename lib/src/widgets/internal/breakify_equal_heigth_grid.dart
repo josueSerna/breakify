@@ -1,7 +1,7 @@
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-class BreakifyEqualHeigthGrid extends StatelessWidget {
+class BreakifyEqualHeightGridLayout extends StatelessWidget {
   final int columns;
   final double crossSpacing;
   final double mainSpacing;
@@ -14,7 +14,7 @@ class BreakifyEqualHeigthGrid extends StatelessWidget {
   final bool? primary;
   final List<Widget> children;
 
-  const BreakifyEqualHeigthGrid(
+  const BreakifyEqualHeightGridLayout(
       {super.key,
       required this.columns,
       required this.crossSpacing,

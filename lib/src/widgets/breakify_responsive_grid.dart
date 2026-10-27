@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:breakify/src/widgets/internal/breakify_equal_heigth_grid.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
@@ -42,6 +43,12 @@ class BreakifyResponsiveGrid extends StatelessWidget {
   /// A value of `1.0` produces square items.
   final double childAspectRatio;
 
+  /// Whether items in each row should match the height of the tallest item.
+  ///
+  /// When enabled, [childAspectRatio] is ignored and each row sizes itself
+  /// from its content. This option is disabled by default.
+  final bool equalHeight;
+
   /// Empty space surrounding the grid.
   final EdgeInsetsGeometry? padding;
 
@@ -74,6 +81,7 @@ class BreakifyResponsiveGrid extends StatelessWidget {
     this.maxColumns,
     this.spacing = 16,
     this.childAspectRatio = 1,
+    this.equalHeight = false,
     this.padding,
     this.physics,
     this.shrinkWrap = false,
@@ -128,13 +136,45 @@ class BreakifyResponsiveGrid extends StatelessWidget {
             ? calculatedColumns
             : calculatedColumns.clamp(1, maxColumns!).toInt();
 
+        final isUnboundedHeight = constraints.maxHeight.isInfinite;
+        final effectivePhysics = physics ??
+            (isUnboundedHeight
+                ? const NeverScrollableScrollPhysics()
+                : null);
+        final effectiveShrinkWrap = shrinkWrap || isUnboundedHeight;
+
+        if (equalHeight) {
+          final grid = BreakifyEqualHeightGridLayout(
+            columns: columnCount,
+            crossSpacing: spacing,
+            mainSpacing: spacing,
+            padding: padding,
+            physics: effectivePhysics,
+            shrinkWrap: effectiveShrinkWrap,
+            controller: controller,
+            scrollCacheExtent: scrollCacheExtent,
+            reverse: reverse,
+            primary: primary,
+            children: children,
+          );
+
+          if (!hasFiniteWidth) {
+            return SizedBox(
+              width: effectiveWidth,
+              child: grid,
+            );
+          }
+
+          return grid;
+        }
+
         final grid = GridView.builder(
           controller: controller,
           reverse: reverse,
           primary: primary,
           padding: padding,
-          physics: physics,
-          shrinkWrap: shrinkWrap,
+          physics: effectivePhysics,
+          shrinkWrap: effectiveShrinkWrap,
           scrollCacheExtent: scrollCacheExtent,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: columnCount,

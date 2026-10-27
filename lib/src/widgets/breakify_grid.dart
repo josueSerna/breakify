@@ -209,7 +209,7 @@ class BreakifyGrid extends StatelessWidget {
           );
         }
 
-        return BreakifyEqualHeigthGrid(
+        return BreakifyEqualHeightGridLayout(
             columns: crossAxisCount,
             crossSpacing: crossSpacing,
             mainSpacing: mainSpacing,

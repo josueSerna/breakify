@@ -3,36 +3,36 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('BreakifyBreakpoints.resolve', () {
-    const breakpoints = BreakifyBreakpoints.defaults;
+    const breakpoints = BreakifyBreakpoints(
+      sm: 640,
+      md: 768,
+      lg: 1024,
+      xl: 1400,
+      xxl: 1600,
+    );
 
-    test('returns sm for widths below md', () {
-      expect(breakpoints.resolve(0), BreakifyBreakpoint.sm);
-      expect(breakpoints.resolve(320), BreakifyBreakpoint.sm);
-      expect(breakpoints.resolve(639), BreakifyBreakpoint.sm);
-    });
+    test('resolves just below, at, and just above every threshold', () {
+      final cases = <(double, BreakifyBreakpoint)>[
+        (639.999, BreakifyBreakpoint.sm),
+        (640, BreakifyBreakpoint.sm),
+        (640.001, BreakifyBreakpoint.sm),
+        (767.999, BreakifyBreakpoint.sm),
+        (768, BreakifyBreakpoint.md),
+        (768.001, BreakifyBreakpoint.md),
+        (1023.999, BreakifyBreakpoint.md),
+        (1024, BreakifyBreakpoint.lg),
+        (1024.001, BreakifyBreakpoint.lg),
+        (1399.999, BreakifyBreakpoint.lg),
+        (1400, BreakifyBreakpoint.xl),
+        (1400.001, BreakifyBreakpoint.xl),
+        (1599.999, BreakifyBreakpoint.xl),
+        (1600, BreakifyBreakpoint.xxl),
+        (1600.001, BreakifyBreakpoint.xxl),
+      ];
 
-    test('returns md at and above md width', () {
-      expect(breakpoints.resolve(768), BreakifyBreakpoint.md);
-      expect(breakpoints.resolve(900), BreakifyBreakpoint.md);
-      expect(breakpoints.resolve(1023), BreakifyBreakpoint.md);
-    });
-
-    test('returns lg at and above lg width', () {
-      expect(breakpoints.resolve(1024), BreakifyBreakpoint.lg);
-      expect(breakpoints.resolve(1200), BreakifyBreakpoint.lg);
-      expect(breakpoints.resolve(1279), BreakifyBreakpoint.lg);
-    });
-
-    test('returns xl at and above xl width', () {
-      expect(breakpoints.resolve(1280), BreakifyBreakpoint.xl);
-      expect(breakpoints.resolve(1400), BreakifyBreakpoint.xl);
-      expect(breakpoints.resolve(1535), BreakifyBreakpoint.xl);
-    });
-
-    test('returns xxl at and above xxl width', () {
-      expect(breakpoints.resolve(1536), BreakifyBreakpoint.xxl);
-      expect(breakpoints.resolve(1800), BreakifyBreakpoint.xxl);
-      expect(breakpoints.resolve(5000), BreakifyBreakpoint.xxl);
+      for (final (width, expected) in cases) {
+        expect(breakpoints.resolve(width), expected, reason: '$width');
+      }
     });
   });
 
