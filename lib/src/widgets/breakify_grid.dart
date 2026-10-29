@@ -4,6 +4,7 @@ import 'package:breakify/src/scope/breakify_scope.dart';
 import 'package:breakify/src/values/breakify_resolvable.dart';
 import 'package:breakify/src/values/breakify_value.dart';
 import 'package:breakify/src/widgets/internal/breakify_equal_heigth_grid.dart';
+import 'package:breakify/src/widgets/internal/breakify_height_mode.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
@@ -102,28 +103,22 @@ class BreakifyGrid extends StatelessWidget {
   /// [PrimaryScrollController].
   final bool? primary;
 
-  /// Whether all items in the same row should have the same height.
+  /// How item heights are resolved.
   ///
-  /// When enabled, the height of each row is determined by its
-  /// tallest child. The remaining children in that row are stretched
-  /// to match that height.
+  /// When null (the default), items are sized from [childAspectRatio]. When
+  /// set, heights come from the content and [childAspectRatio] is ignored:
+  /// see [BreakifyHeightMode] for the available modes.
   ///
-  /// This option is intended for grids containing items with
-  /// different intrinsic heights.
-  ///
-  /// The row height is measured with the children's max intrinsic height at
-  /// the final column width, and every child is then laid out with that
-  /// tight height. Because the height is bounded, `Spacer` and `Expanded`
-  /// inside a `Column` work as expected.
-  ///
-  /// Children must support intrinsic measurement. Widgets that do not, such
-  /// as `LayoutBuilder`, are not supported. Intrinsic measurement also adds
-  /// layout cost, so avoid this option for very large grids.
-  ///
-  /// The [childAspectRatio] is ignored when this option is enabled.
+  /// The height is measured with the children's max intrinsic height at the
+  /// final column width, and children are laid out with that tight height, so
+  /// `Spacer` and `Expanded` inside a `Column` work (except in
+  /// [BreakifyHeightMode.natural]). Children must support intrinsic
+  /// measurement; widgets that do not, such as `LayoutBuilder`, are not
+  /// supported. Intrinsic measurement adds layout cost, so avoid it for very
+  /// large grids.
   ///
   /// Currently only supported with [Axis.vertical].
-  final bool equalHeight;
+  final BreakifyHeightMode? heightMode;
 
   /// Creates a responsive grid.
   const BreakifyGrid({
@@ -143,10 +138,10 @@ class BreakifyGrid extends StatelessWidget {
     this.scrollCacheExtent,
     this.reverse = false,
     this.primary,
-    this.equalHeight = false,
+    this.heightMode,
   }) : assert(
-          !equalHeight || scrollDirection == Axis.vertical,
-          'BreakifyGrid.equalHeight currently only supports '
+          heightMode == null || scrollDirection == Axis.vertical,
+          'BreakifyGrid.heightMode currently only supports '
           'Axis.vertical.',
         );
 
@@ -184,7 +179,7 @@ class BreakifyGrid extends StatelessWidget {
             ? constraints.maxHeight.isInfinite
             : constraints.maxWidth.isInfinite;
 
-        if (!equalHeight) {
+        if (heightMode == null) {
           final resolvedAspectRatio = childAspectRatio.resolve(
             breakpoint,
             width,
@@ -232,6 +227,7 @@ class BreakifyGrid extends StatelessWidget {
             scrollCacheExtent: scrollCacheExtent,
             reverse: reverse,
             primary: primary,
+            heightMode: heightMode!,
             children: children);
       },
     );

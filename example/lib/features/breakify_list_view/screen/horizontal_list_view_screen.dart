@@ -35,37 +35,27 @@ class _HorizontalListViewScreenState extends State<HorizontalListViewScreen> {
               'Horizontal Scroll',
               style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 8),
-
             const Text(
               'BreakifyListView can scroll horizontally while '
               'maintaining responsive spacing between items.',
             ),
-
             const SizedBox(height: 24),
-
             Text(
               'Current breakpoint: '
               '${context.breakpoint.name.toUpperCase()}',
             ),
-
             const SizedBox(height: 8),
-
             Text(
               'Available width: '
               '${context.breakifyWidth.toStringAsFixed(0)} px',
             ),
-
             const SizedBox(height: 8),
-
             Text(
               'Current spacing: '
               '${resolvedSpacing.toStringAsFixed(1)} px',
             ),
-
             const SizedBox(height: 32),
-
             SizedBox(
               height: 160,
               child: Scrollbar(
@@ -97,9 +87,7 @@ class _HorizontalListViewScreenState extends State<HorizontalListViewScreen> {
                 ),
               ),
             ),
-
             const SizedBox(height: 32),
-
             const Text(
               'The list changes its spacing responsively while '
               'scrolling horizontally through its items.',

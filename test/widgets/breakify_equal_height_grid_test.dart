@@ -34,6 +34,7 @@ void main() {
     BreakifyValue<int> columns = const BreakifyValue(sm: 1, md: 2, lg: 3),
     double spacing = 10,
     EdgeInsets? padding,
+    BreakifyHeightMode mode = BreakifyHeightMode.equalInRow,
   }) async {
     tester.view.physicalSize = Size(width, 1600);
     tester.view.devicePixelRatio = 1;
@@ -49,7 +50,7 @@ void main() {
                 columns: columns,
                 spacing: BreakifyValue(sm: spacing),
                 padding: padding,
-                equalHeight: true,
+                heightMode: mode,
                 children: children,
               ),
             ),
@@ -90,6 +91,90 @@ void main() {
     // laid out alone.
     final short = tester.getSize(find.byKey(const ValueKey('card4')));
     expect(sizeOf(tester, 1).height, greaterThan(short.height));
+  });
+
+  testWidgets('equal makes every card the same height across rows',
+      (tester) async {
+    await pump(
+      tester,
+      width: 800,
+      mode: BreakifyHeightMode.equal,
+      children: [
+        card(0, 'Short'),
+        card(1, 'A much longer description that wraps. ' * 6),
+        card(2, 'Short'),
+        card(3, 'Short'),
+      ],
+    );
+
+    expect(tester.takeException(), isNull);
+    final h = sizeOf(tester, 1).height;
+    for (var i = 0; i < 4; i++) {
+      expect(sizeOf(tester, i).height, h);
+    }
+  });
+
+  testWidgets('equal supports Spacer and Expanded', (tester) async {
+    await pump(
+      tester,
+      width: 800,
+      mode: BreakifyHeightMode.equal,
+      children: [
+        card(0, 'Short', spacer: true),
+        card(1, 'A much longer description that wraps. ' * 6),
+        card(2, 'Expanded', expanded: true),
+        card(3, 'Short', spacer: true),
+      ],
+    );
+
+    expect(tester.takeException(), isNull);
+    final h = sizeOf(tester, 1).height;
+    for (var i = 0; i < 4; i++) {
+      expect(sizeOf(tester, i).height, h);
+    }
+    final button = tester.getRect(find.descendant(
+        of: find.byKey(const ValueKey('card0')),
+        matching: find.byType(ElevatedButton)));
+    final cardRect = tester.getRect(find.byKey(const ValueKey('card0')));
+    expect(cardRect.bottom - button.bottom, lessThanOrEqualTo(20));
+  });
+
+  testWidgets('equalInRow lets rows differ in height', (tester) async {
+    await pump(
+      tester,
+      width: 800,
+      children: [
+        card(0, 'Short'),
+        card(1, 'A much longer description that wraps. ' * 6),
+        card(2, 'Short'),
+        card(3, 'Short'),
+      ],
+    );
+
+    expect(sizeOf(tester, 0).height, sizeOf(tester, 1).height);
+    expect(sizeOf(tester, 2).height, sizeOf(tester, 3).height);
+    expect(sizeOf(tester, 2).height, lessThan(sizeOf(tester, 0).height));
+  });
+
+  testWidgets('natural keeps each card its own height', (tester) async {
+    await pump(
+      tester,
+      width: 800,
+      mode: BreakifyHeightMode.natural,
+      children: [
+        card(0, 'Short'),
+        card(1, 'A much longer description that wraps. ' * 6),
+        card(2, 'Short'),
+        card(3, 'Short'),
+      ],
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(sizeOf(tester, 0).height, lessThan(sizeOf(tester, 1).height));
+    expect(sizeOf(tester, 2).height, sizeOf(tester, 0).height);
+    final r0 = tester.getRect(find.byKey(const ValueKey('card0')));
+    final r2 = tester.getRect(find.byKey(const ValueKey('card2')));
+    expect(r2.top - r0.top, sizeOf(tester, 1).height + 10);
   });
 
   testWidgets('respects columns, spacing and padding', (tester) async {

@@ -1,3 +1,48 @@
+# Unreleased
+
+## Breaking changes
+
+- Replaced the `equalHeight` boolean of `BreakifyGrid` and
+  `BreakifyResponsiveGrid` with a nullable `heightMode` of the new
+  `BreakifyHeightMode` enum, exported from `package:breakify/breakify.dart`.
+  - `equalHeight: true` → `heightMode: BreakifyHeightMode.equalInRow`
+    (identical behavior).
+  - `equalHeight: false` → `heightMode: null` (default); items keep using
+    `childAspectRatio`.
+- When `heightMode` is not `null`, `childAspectRatio` is ignored.
+
+## Added
+
+- `BreakifyHeightMode.equal`: every item has exactly the same height, the
+  tallest of the whole grid. `Spacer` and `Expanded` are supported.
+- `BreakifyHeightMode.equalInRow`: every item in a row matches that row's
+  tallest item; rows may differ. `Spacer` and `Expanded` are supported.
+- `BreakifyHeightMode.natural`: every item keeps its natural height, aligned
+  to the top of its row. `Spacer` and `Expanded` are not supported because the
+  height is unbounded.
+- Example screen "Raw Equal (experimental)" with unstyled, very uneven cards,
+  a mode selector and a configurable number of cards.
+
+## Performance
+
+- `equalInRow` and `natural` build rows lazily.
+- `equal` measures one row at a time and discards it, caches the shared
+  height until the width, columns, spacing or children change, and keeps only
+  the visible rows alive. In a local benchmark (3 columns, debug VM) with 2000
+  cards it went from 130,044 to 655 live elements, and rebuilds at the same
+  width from ~18.6 ms to ~0.6 ms. The first render improved (~1346 ms to
+  ~825 ms), but a continuous width change costs more (~576 ms to ~754 ms)
+  because every row is measured again.
+- Each row now includes `mainSpacing` below it in `equal` mode, so the total
+  scroll extent is one `mainSpacing` longer.
+
+## Documentation
+
+- Added a "Latest Important Updates" section to `README.md` and
+  `README.es.md` describing `heightMode` and how to migrate.
+- Grid documentation now refers to `heightMode` instead of `equalHeight`.
+- Updated the equal-height example screens to show every mode.
+
 # 0.2.2
 
 - Fixed `equalHeight` row layout in `BreakifyGrid` and

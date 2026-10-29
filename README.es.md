@@ -41,6 +41,7 @@
 
 ## Tabla de Contenidos
 
+- [Últimas Actualizaciones Importantes](#últimas-actualizaciones-importantes)
 - [¿Qué es Breakify?](#qué-es-breakify)
 - [¿Por qué Breakify?](#por-qué-breakify)
 - [Características](#características)
@@ -67,6 +68,60 @@
 - [Contribuir](#contribuir)
 - [Licencia](#licencia)
 - [Autor](#autor)
+
+---
+
+## Últimas Actualizaciones Importantes
+
+### `heightMode` reemplaza a `equalHeight` en `BreakifyGrid` y `BreakifyResponsiveGrid`
+
+> **Cambio incompatible (breaking).** El booleano `equalHeight` ya no existe.
+> Fue reemplazado por `heightMode`, un enum `BreakifyHeightMode` nullable que
+> permite elegir *cómo* se calcula la altura de los ítems.
+
+| `heightMode` | Comportamiento | `Spacer` / `Expanded` | Carga |
+|---|---|---|---|
+| `null` (por defecto) | Los ítems se dimensionan con `childAspectRatio` | n/a | Perezosa |
+| `BreakifyHeightMode.equal` | Todos los ítems tienen exactamente la misma altura: la del ítem más alto de todo el grid | Soportado | Las filas se miden una vez y se guarda en caché; solo las filas visibles permanecen vivas |
+| `BreakifyHeightMode.equalInRow` | Los ítems de cada fila tienen la altura del ítem más alto de esa fila. Las filas pueden diferir entre sí | Soportado | Perezosa |
+| `BreakifyHeightMode.natural` | Cada ítem conserva su altura natural, alineado arriba de su fila | No soportado (altura sin límite) | Perezosa |
+
+Cuando `heightMode` no es `null`, `childAspectRatio` se ignora y las alturas
+salen del contenido. Actualmente solo soporta `Axis.vertical` en
+`BreakifyGrid`, y los hijos deben admitir medición intrínseca (widgets como
+`LayoutBuilder` no están soportados).
+
+**Migración**
+
+```dart
+// Antes
+BreakifyGrid(
+  columns: const BreakifyValue(sm: 1, md: 2, lg: 3),
+  equalHeight: true,
+  children: cards,
+)
+
+// Después (mismo comportamiento que el antiguo `equalHeight: true`)
+BreakifyGrid(
+  columns: const BreakifyValue(sm: 1, md: 2, lg: 3),
+  heightMode: BreakifyHeightMode.equalInRow,
+  children: cards,
+)
+```
+
+`equalHeight: false` pasa a ser `heightMode: null` (o simplemente omitirlo).
+
+**Cómo elegir el modo**
+
+* Usa `equalInRow` para listas largas o con scroll: es perezoso y barato.
+* Usa `equal` cuando todas las tarjetas deben verse idénticas entre filas. Su
+  primer layout y cada cambio de ancho miden todas las tarjetas, así que
+  conviene hasta unos pocos cientos de ítems.
+* Usa `natural` cuando las tarjetas deben conservar su tamaño. No pongas
+  `Spacer` ni `Expanded` en su `Column`; usa `mainAxisSize: MainAxisSize.min`.
+
+`BreakifyHeightMode` se exporta desde `package:breakify/breakify.dart`.
+Consulta el [CHANGELOG](CHANGELOG.md) para más detalles.
 
 ---
 
@@ -351,27 +406,6 @@ BreakifyAdaptativeLayout(
 `CrossAxisAlignment.stretch` al layout vertical. El espaciado puede ser un
 `BreakifyValue` o un `BreakifyFluidValue`.
 
-#### Altura igualada
-
-Por defecto, cada ítem de una fila se dimensiona con `childAspectRatio`, de
-modo que una tarjeta con más contenido que sus vecinas puede desbordarse. Con
-`equalHeight: true`, el grid ignora `childAspectRatio` y calcula cada fila a
-partir de su ítem más alto: todas las tarjetas de esa fila tienen la misma
-altura y las más cortas se estiran para igualarla. Como la altura ya es
-conocida, un `Column` dentro de una tarjeta puede usar `Spacer` o `Expanded`
-para llevar un botón al final.
-
-```dart
-BreakifyGrid(
-  columns: const BreakifyValue(sm: 1, md: 2, lg: 3),
-  equalHeight: true,
-  children: [
-    Card(child: Text('Contenido corto')),
-    Card(child: Text('Contenido que necesita más espacio vertical.')),
-  ],
-)
-```
-
 ---
 
 ### BreakifyGrid
@@ -405,13 +439,20 @@ También soporta:
   para desplazarse hacia los lados en vez de verticalmente. En este modo,
   `columns` controla el número de filas en vez de columnas, y
   `childAspectRatio` se sigue expresando como ancho / alto.
-* **Filas de igual altura** — configura `equalHeight: true` para que
-  todos los ítems de una fila igualen la altura del ítem más alto de esa
-  fila. Útil para grids con ítems de altura intrínseca variable. La altura
-  de la fila se mide una vez y los ítems reciben esa altura exacta, por lo
-  que `Spacer` y `Expanded` dentro de un `Column` funcionan. Los hijos deben
-  admitir medición intrínseca (por ejemplo, `LayoutBuilder` no está
-  soportado). Actualmente solo soportado con `Axis.vertical`.
+* **Modos de altura** — configura `heightMode` (un `BreakifyHeightMode`) para
+  dimensionar los ítems según su contenido en lugar de `childAspectRatio`,
+  que entonces se ignora.
+  * `BreakifyHeightMode.equal`: todos los ítems tienen la misma altura (la
+    del más alto de todo el grid).
+  * `BreakifyHeightMode.equalInRow`: los ítems de cada fila igualan al más
+    alto de esa fila; las filas pueden diferir.
+  * `BreakifyHeightMode.natural`: cada ítem conserva su propia altura.
+
+  Las alturas se miden una vez, por lo que `Spacer` y `Expanded` dentro de un
+  `Column` funcionan (excepto con `natural`). Los hijos deben admitir
+  medición intrínseca (`LayoutBuilder` no está soportado). Actualmente solo
+  soportado con `Axis.vertical`. Consulta
+  [Últimas Actualizaciones Importantes](#últimas-actualizaciones-importantes).
 
 ```dart
 BreakifyGrid(
@@ -451,21 +492,19 @@ el resultado y siempre se usa al menos una columna. A diferencia de
 `BreakifyGrid`, este widget no requiere definir un valor para cada breakpoint y
 responde al ancho local proporcionado por su padre.
 
-Configura `equalHeight: true` para que los ítems de cada fila tengan la altura
-del ítem más alto de esa fila. Sin esta opción, cada ítem se dimensiona con
-`childAspectRatio`, por lo que una tarjeta con más contenido que sus vecinas
-puede desbordarse. Con ella, el número de columnas se sigue calculando según el
-ancho disponible, pero cada fila se dimensiona a partir de su ítem más alto y
-las demás tarjetas se estiran para igualarlo. Es opcional, ignora
-`childAspectRatio` y no impone una altura fija. `Spacer` y `Expanded` dentro
-del `Column` de una tarjeta funcionan porque la altura de la fila es conocida.
+Configura `heightMode` (`BreakifyHeightMode.equal`, `equalInRow` o `natural`)
+para dimensionar los ítems según su contenido. Es opcional (`null` por
+defecto) e ignora `childAspectRatio`. El número de columnas se sigue
+calculando según el ancho disponible. Consulta
+[Últimas Actualizaciones Importantes](#últimas-actualizaciones-importantes)
+para ver el comportamiento de cada modo.
 
 ```dart
 BreakifyResponsiveGrid(
   minItemWidth: 220,
   maxColumns: 3,
   spacing: 16,
-  equalHeight: true,
+  heightMode: BreakifyHeightMode.equalInRow,
   children: [
     Card(child: Text('Contenido corto')),
     Card(child: Text('Contenido que necesita más espacio vertical.')),

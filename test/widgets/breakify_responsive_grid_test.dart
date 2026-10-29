@@ -201,7 +201,7 @@ void main() {
     );
 
     testWidgets(
-      'equalHeight matches items within a row',
+      'heightMode equalInRow matches items within a row',
       (tester) async {
         await tester.pumpWidget(
           const Directionality(
@@ -214,7 +214,7 @@ void main() {
                 child: BreakifyResponsiveGrid(
                   minItemWidth: 200,
                   spacing: 16,
-                  equalHeight: true,
+                  heightMode: BreakifyHeightMode.equalInRow,
                   shrinkWrap: true,
                   children: [
                     Text('Short'),

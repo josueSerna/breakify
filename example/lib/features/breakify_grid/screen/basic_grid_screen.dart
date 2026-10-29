@@ -29,16 +29,12 @@ class BasicGridScreen extends StatelessWidget {
               'Responsive Grid',
               style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 8),
-
             const Text(
               'A grid that automatically adapts its columns, '
               'spacing and aspect ratio to the available width.',
             ),
-
             const SizedBox(height: 24),
-
             GridInfo(
               breakpoint: context.breakpoint,
               width: context.breakifyWidth,
@@ -46,9 +42,7 @@ class BasicGridScreen extends StatelessWidget {
               spacing: resolvedSpacing,
               aspectRatio: resolvedAspectRatio,
             ),
-
             const SizedBox(height: 24),
-
             BreakifyGrid(
               columns: columns,
               spacing: spacing,

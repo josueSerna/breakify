@@ -22,16 +22,12 @@ class BasicAdaptativeScreen extends StatelessWidget {
               'Column → Row',
               style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 8),
-
             const Text(
               'The layout switches from a vertical Column '
               'to a horizontal Row at the md breakpoint.',
             ),
-
             const SizedBox(height: 24),
-
             Wrap(
               spacing: 16,
               runSpacing: 8,
@@ -50,9 +46,7 @@ class BasicAdaptativeScreen extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 32),
-
             BreakifyContainer(
               child: BreakifyAdaptativeLayout(
                 breakpoint: BreakifyBreakpoint.md,

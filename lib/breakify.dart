@@ -24,3 +24,4 @@ export 'src/widgets/breakify_panel_layout.dart';
 export 'src/widgets/breakify_responsive_grid.dart';
 export 'src/widgets/breakify_section.dart';
 export 'src/widgets/breakify_visibility.dart';
+export 'src/widgets/internal/breakify_height_mode.dart';

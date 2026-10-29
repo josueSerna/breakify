@@ -21,37 +21,27 @@ class ListViewSpacingScreen extends StatelessWidget {
               'Responsive Spacing',
               style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 8),
-
             const Text(
               'BreakifyListView adjusts the spacing between items '
               'according to the available screen width.',
             ),
-
             const SizedBox(height: 24),
-
             Text(
               'Current breakpoint: '
               '${context.breakpoint.name.toUpperCase()}',
             ),
-
             const SizedBox(height: 8),
-
             Text(
               'Available width: '
               '${context.breakifyWidth.toStringAsFixed(0)} px',
             ),
-
             const SizedBox(height: 8),
-
             Text(
               'Current spacing: '
               '${resolvedSpacing.toStringAsFixed(1)} px',
             ),
-
             const SizedBox(height: 32),
-
             SizedBox(
               height: 360,
               child: BreakifyListView(
@@ -69,9 +59,7 @@ class ListViewSpacingScreen extends StatelessWidget {
                 },
               ),
             ),
-
             const SizedBox(height: 32),
-
             const Text(
               'The spacing is resolved using BreakifyFluidValue, '
               'so it transitions smoothly between the defined '

@@ -17,30 +17,22 @@ class SeparatorListViewScreen extends StatelessWidget {
               'Custom Separator',
               style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 8),
-
             const Text(
               'BreakifyListView allows you to replace the default '
               'responsive spacing with a custom separator.',
             ),
-
             const SizedBox(height: 24),
-
             Text(
               'Current breakpoint: '
               '${context.breakpoint.name.toUpperCase()}',
             ),
-
             const SizedBox(height: 8),
-
             Text(
               'Available width: '
               '${context.breakifyWidth.toStringAsFixed(0)} px',
             ),
-
             const SizedBox(height: 32),
-
             SizedBox(
               height: 400,
               child: BreakifyListView(
@@ -56,9 +48,7 @@ class SeparatorListViewScreen extends StatelessWidget {
                 },
               ),
             ),
-
             const SizedBox(height: 32),
-
             const Text(
               'When a separator is provided, the responsive '
               'spacing value is ignored and the separator is '
