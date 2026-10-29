@@ -5,6 +5,7 @@ import 'package:example/features/breakify_grid/screen/breakify_grid_screen.dart'
 import 'package:example/features/breakify_list_view/screen/breakify_list_view_screen.dart';
 import 'package:example/features/breakify_panel_layout/screen/breakify_panel_layout_screen.dart';
 import 'package:example/features/breakify_responsive_grid/screen/breakify_responsive_grid_screen.dart';
+import 'package:example/features/breakify_section/screen/breakify_section_screen.dart';
 import 'package:example/features/breakify_visibility/screen/breakify_visibility_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -54,6 +55,13 @@ class HomeScreen extends StatelessWidget {
                 'the available width.',
             icon: Icons.grid_4x4,
             page: BreakifyResponsiveGridScreen(),
+          ),
+          ExampleCard(
+            title: 'BreakifySection (experimental)',
+            description: 'Full-width page sections with responsive padding, '
+                'minimum height and full viewport height.',
+            icon: Icons.web,
+            page: BreakifySectionScreen(),
           ),
           ExampleCard(
             title: 'BreakifyAdaptativeLayout',
