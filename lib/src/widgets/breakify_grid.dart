@@ -111,6 +111,15 @@ class BreakifyGrid extends StatelessWidget {
   /// This option is intended for grids containing items with
   /// different intrinsic heights.
   ///
+  /// The row height is measured with the children's max intrinsic height at
+  /// the final column width, and every child is then laid out with that
+  /// tight height. Because the height is bounded, `Spacer` and `Expanded`
+  /// inside a `Column` work as expected.
+  ///
+  /// Children must support intrinsic measurement. Widgets that do not, such
+  /// as `LayoutBuilder`, are not supported. Intrinsic measurement also adds
+  /// layout cost, so avoid this option for very large grids.
+  ///
   /// The [childAspectRatio] is ignored when this option is enabled.
   ///
   /// Currently only supported with [Axis.vertical].

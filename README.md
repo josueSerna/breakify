@@ -58,6 +58,7 @@
   - [BreakifyPanelLayout](#breakifypanellayout)
   - [BreakifyListView](#breakifylistview)
   - [BreakifyContainer](#breakifycontainer)
+  - [BreakifySection (experimental)](#breakifysection-experimental)
   - [BreakifyVisibility](#breakifyvisibility)
   - [BreakifyBuilder](#breakifybuilder)
   - [BreakifyDebugBanner](#breakifydebugbanner)
@@ -142,6 +143,7 @@ The responsive logic stays centralized, making your widgets easier to read, main
 * Horizontal grids and equal-height rows
 * Responsive list views (vertical and horizontal)
 * Main-and-secondary panel layouts
+* Experimental page sections (`BreakifySection`)
 * Conditional visibility by breakpoint, globally or locally
 * Development breakpoint banner with configurable position
 
@@ -160,7 +162,7 @@ Add Breakify to your `pubspec.yaml`.
 
 ```yaml
 dependencies:
-  breakify: ^0.2.1
+  breakify: ^0.2.2
 ```
 
 Then import the package.
@@ -383,7 +385,10 @@ It also supports:
   expressed as width / height.
 * **Equal-height rows** — set `equalHeight: true` to make every item in a
   row match the height of the tallest item in that row. Useful for grids
-  with items of varying intrinsic height. Currently only supported with
+  with items of varying intrinsic height. The row height is measured once
+  and items receive that exact height, so `Spacer` and `Expanded` inside a
+  `Column` work. Children must support intrinsic measurement (for example,
+  `LayoutBuilder` is not supported). Currently only supported with
   `Axis.vertical`.
 
 ```dart
@@ -514,6 +519,35 @@ BreakifyContainer(
 
 `maxWidth` and `padding` support `BreakifyValue` and `BreakifyFluidValue`.
 `margin` and `alignment` use Flutter's regular layout types.
+
+---
+
+### BreakifySection (experimental)
+
+> **Experimental in 0.2.2:** its API may change in future releases.
+
+A full-width section for web pages and landing pages. It supports a
+background, alignment, responsive `padding` and `minHeight`, and
+`fullViewport`.
+
+```dart
+BreakifySection(
+  backgroundColor: Colors.indigo.shade50,
+  fullViewport: true,
+  padding: const BreakifyValue<EdgeInsetsGeometry>(
+    sm: EdgeInsets.all(16),
+    lg: EdgeInsets.symmetric(horizontal: 96, vertical: 48),
+  ),
+  child: const BreakifyContainer(child: Hero()),
+)
+```
+
+`padding` and `minHeight` support `BreakifyValue` and `BreakifyFluidValue`.
+With `fullViewport: true` the minimum height is the viewport height
+(`MediaQuery.sizeOf(context).height`); if `minHeight` is also set, the larger
+value is used. The section grows when its content needs more room and does not
+scroll on its own, so place it inside a `ListView` or `SingleChildScrollView`.
+Requires a `BreakifyScope`.
 
 ---
 

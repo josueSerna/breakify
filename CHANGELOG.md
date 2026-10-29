@@ -1,3 +1,19 @@
+# 0.2.2
+
+- Fixed `equalHeight` row layout in `BreakifyGrid` and
+  `BreakifyResponsiveGrid`: rows now use a dedicated render object that
+  measures once and lays children out with a tight height, so `Spacer` and
+  `Expanded` inside cards work. Children that cannot report intrinsic
+  dimensions (such as `LayoutBuilder`) remain unsupported.
+- Added an equal-height example with `Spacer`, `Expanded`, incomplete rows
+  and a comparison with `equalHeight: false`.
+- Split the `BreakifyResponsiveGrid` example into Basic and Equal Height
+  screens, matching the `BreakifyGrid` example.
+- Added the experimental `BreakifySection` widget for page and landing-page
+  sections, with an optional background, alignment, responsive `padding` and
+  `minHeight`, and `fullViewport`. Its API may change in future releases.
+- Added a `BreakifySection` example to the example app.
+
 # 0.2.1
 
 - Fixed breakpoint resolution so each configured breakpoint is active at its

@@ -1,6 +1,6 @@
-import 'package:breakify/breakify.dart';
-import 'package:example/features/breakify_grid/widgets/demo_card.dart';
-import 'package:example/features/breakify_grid/widgets/grid_card.dart';
+import 'package:example/features/breakify_responsive_grid/screen/basic_responsive_grid_screen.dart';
+import 'package:example/features/breakify_responsive_grid/screen/equal_height_responsive_grid_screen.dart';
+import 'package:example/presentation/widgets/example_card.dart';
 import 'package:flutter/material.dart';
 
 class BreakifyResponsiveGridScreen extends StatelessWidget {
@@ -23,106 +23,20 @@ class BreakifyResponsiveGridScreen extends StatelessWidget {
             'based on the available width.',
           ),
           const SizedBox(height: 32),
-          const Text(
-            'Adaptive columns',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ExampleCard(
+            title: 'Basic',
+            description:
+                'Adaptive columns, maximum columns and unbounded width.',
+            icon: Icons.grid_view,
+            page: BasicResponsiveGridScreen(),
           ),
-          const SizedBox(height: 8),
-          const Text(
-            'Resize the window to see the grid add or remove columns '
-            'while keeping the minimum item width.',
-          ),
-          const SizedBox(height: 16),
-          BreakifyResponsiveGrid(
-            minItemWidth: 180,
-            spacing: 16,
-            padding: const EdgeInsets.all(4),
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            children: List.generate(
-              8,
-              (index) => GridCard(index: index),
-            ),
-          ),
-          const SizedBox(height: 32),
-          const Text(
-            'Equal-height rows',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Enable equalHeight to match cards within each row to the '
-            'tallest card while preserving automatic columns.',
-          ),
-          const SizedBox(height: 16),
-          BreakifyResponsiveGrid(
-            minItemWidth: 180,
-            maxColumns: 3,
-            spacing: 16,
-            equalHeight: true,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            children: const [
-              DemoCard(
-                title: 'Short card',
-                description: 'A short description.',
-              ),
-              DemoCard(
-                title: 'Long card',
-                description: 'This card contains more content and determines '
-                    'the height of its row.',
-              ),
-              DemoCard(
-                title: 'Another card',
-                description: 'Cards reflow as the local width changes.',
-              ),
-            ],
-          ),
-          const SizedBox(height: 32),
-          const Text(
-            'Maximum columns',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Use maxColumns when the grid should stop growing '
-            'after a specific number of columns.',
-          ),
-          const SizedBox(height: 16),
-          BreakifyResponsiveGrid(
-            minItemWidth: 160,
-            maxColumns: 3,
-            spacing: 16,
-            childAspectRatio: 1.4,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            children: List.generate(
-              6,
-              (index) => GridCard(index: index),
-            ),
-          ),
-          const SizedBox(height: 32),
-          const Text(
-            'Unbounded width',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'When the parent does not provide a finite width, '
-            'the grid falls back to its minimum item width.',
-          ),
-          const SizedBox(height: 16),
-          UnconstrainedBox(
-            alignment: Alignment.topLeft,
-            child: BreakifyResponsiveGrid(
-              minItemWidth: 180,
-              spacing: 16,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: const [
-                GridCard(index: 0),
-              ],
-            ),
+          ExampleCard(
+            title: 'Equal Height',
+            description:
+                'Cards in the same row share the height of the tallest one, '
+                'with Spacer and Expanded.',
+            icon: Icons.height,
+            page: EqualHeightResponsiveGridScreen(),
           ),
         ],
       ),

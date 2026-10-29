@@ -58,6 +58,7 @@
   - [BreakifyPanelLayout](#breakifypanellayout)
   - [BreakifyListView](#breakifylistview)
   - [BreakifyContainer](#breakifycontainer)
+  - [BreakifySection (experimental)](#breakifysection-experimental)
   - [BreakifyVisibility](#breakifyvisibility)
   - [BreakifyBuilder](#breakifybuilder)
   - [BreakifyDebugBanner](#breakifydebugbanner)
@@ -142,6 +143,7 @@ La lógica responsiva se mantiene centralizada, haciendo tus widgets más fácil
 * Grids horizontales y filas de igual altura
 * Listas responsivas (verticales y horizontales)
 * Layouts de panel principal y paneles secundarios
+* Secciones de página experimentales (`BreakifySection`)
 * Visibilidad condicional según breakpoint, global o local
 * Banner de breakpoint configurable para desarrollo
 
@@ -160,7 +162,7 @@ Agrega Breakify a tu `pubspec.yaml`.
 
 ```yaml
 dependencies:
-  breakify: ^0.2.1
+  breakify: ^0.2.2
 ```
 
 Luego importa el paquete.
@@ -349,6 +351,27 @@ BreakifyAdaptativeLayout(
 `CrossAxisAlignment.stretch` al layout vertical. El espaciado puede ser un
 `BreakifyValue` o un `BreakifyFluidValue`.
 
+#### Altura igualada
+
+Por defecto, cada ítem de una fila se dimensiona con `childAspectRatio`, de
+modo que una tarjeta con más contenido que sus vecinas puede desbordarse. Con
+`equalHeight: true`, el grid ignora `childAspectRatio` y calcula cada fila a
+partir de su ítem más alto: todas las tarjetas de esa fila tienen la misma
+altura y las más cortas se estiran para igualarla. Como la altura ya es
+conocida, un `Column` dentro de una tarjeta puede usar `Spacer` o `Expanded`
+para llevar un botón al final.
+
+```dart
+BreakifyGrid(
+  columns: const BreakifyValue(sm: 1, md: 2, lg: 3),
+  equalHeight: true,
+  children: [
+    Card(child: Text('Contenido corto')),
+    Card(child: Text('Contenido que necesita más espacio vertical.')),
+  ],
+)
+```
+
 ---
 
 ### BreakifyGrid
@@ -384,8 +407,11 @@ También soporta:
   `childAspectRatio` se sigue expresando como ancho / alto.
 * **Filas de igual altura** — configura `equalHeight: true` para que
   todos los ítems de una fila igualen la altura del ítem más alto de esa
-  fila. Útil para grids con ítems de altura intrínseca variable.
-  Actualmente solo soportado con `Axis.vertical`.
+  fila. Útil para grids con ítems de altura intrínseca variable. La altura
+  de la fila se mide una vez y los ítems reciben esa altura exacta, por lo
+  que `Spacer` y `Expanded` dentro de un `Column` funcionan. Los hijos deben
+  admitir medición intrínseca (por ejemplo, `LayoutBuilder` no está
+  soportado). Actualmente solo soportado con `Axis.vertical`.
 
 ```dart
 BreakifyGrid(
@@ -426,8 +452,13 @@ el resultado y siempre se usa al menos una columna. A diferencia de
 responde al ancho local proporcionado por su padre.
 
 Configura `equalHeight: true` para que los ítems de cada fila tengan la altura
-del ítem más alto de esa fila. Es opcional, ignora `childAspectRatio` y calcula
-las filas a partir del contenido sin imponer una altura fija.
+del ítem más alto de esa fila. Sin esta opción, cada ítem se dimensiona con
+`childAspectRatio`, por lo que una tarjeta con más contenido que sus vecinas
+puede desbordarse. Con ella, el número de columnas se sigue calculando según el
+ancho disponible, pero cada fila se dimensiona a partir de su ítem más alto y
+las demás tarjetas se estiran para igualarlo. Es opcional, ignora
+`childAspectRatio` y no impone una altura fija. `Spacer` y `Expanded` dentro
+del `Column` de una tarjeta funcionan porque la altura de la fila es conocida.
 
 ```dart
 BreakifyResponsiveGrid(
@@ -517,6 +548,34 @@ BreakifyContainer(
 
 `maxWidth` y `padding` aceptan `BreakifyValue` y `BreakifyFluidValue`.
 `margin` y `alignment` usan los tipos de layout normales de Flutter.
+
+---
+
+### BreakifySection (experimental)
+
+> **Experimental en 0.2.2:** su API podría cambiar en próximas versiones.
+
+Sección de ancho completo para páginas web y landing pages. Admite fondo,
+alineación, `padding` y `minHeight` responsivos, y `fullViewport`.
+
+```dart
+BreakifySection(
+  backgroundColor: Colors.indigo.shade50,
+  fullViewport: true,
+  padding: const BreakifyValue<EdgeInsetsGeometry>(
+    sm: EdgeInsets.all(16),
+    lg: EdgeInsets.symmetric(horizontal: 96, vertical: 48),
+  ),
+  child: const BreakifyContainer(child: Hero()),
+)
+```
+
+`padding` y `minHeight` aceptan `BreakifyValue` y `BreakifyFluidValue`. Con
+`fullViewport: true` la altura mínima es la del viewport
+(`MediaQuery.sizeOf(context).height`); si también defines `minHeight`, se usa
+el mayor. La sección crece cuando su contenido lo necesita y no crea scroll
+propio, así que colócala dentro de un `ListView` o `SingleChildScrollView`.
+Requiere un `BreakifyScope`.
 
 ---
 
