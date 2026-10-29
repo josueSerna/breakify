@@ -47,30 +47,22 @@ class _HorizontalGridScreenState extends State<HorizontalGridScreen> {
               'Horizontal Grid',
               style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 8),
-
             const Text(
               'BreakifyGrid can scroll horizontally while '
               'keeping its layout responsive.',
             ),
-
             const SizedBox(height: 24),
-
             Text(
               'Current breakpoint: '
               '${context.breakpoint.name.toUpperCase()}',
             ),
-
             const SizedBox(height: 8),
-
             Text(
               'Rows: $resolvedColumns  •  '
               'Spacing: ${resolvedSpacing.toStringAsFixed(0)} px',
             ),
-
             const SizedBox(height: 32),
-
             SizedBox(
               height: resolvedHeight,
               child: Scrollbar(
@@ -89,9 +81,7 @@ class _HorizontalGridScreenState extends State<HorizontalGridScreen> {
                 ),
               ),
             ),
-
             const SizedBox(height: 32),
-
             const Text(
               'The grid scrolls horizontally while the number '
               'of rows adapts to the current breakpoint.',

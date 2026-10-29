@@ -25,15 +25,12 @@ class DistributeAdaptativeScreen extends StatelessWidget {
               'When enabled, every child expands to share '
               'the available horizontal space.',
             ),
-
             const SizedBox(height: 24),
             Text(
               'Current breakpoint: '
               '${context.breakpoint.name.toUpperCase()}',
             ),
-
             const SizedBox(height: 32),
-
             BreakifyAdaptativeLayout(
               breakpoint: BreakifyBreakpoint.md,
               spacing: spacing,
@@ -45,14 +42,11 @@ class DistributeAdaptativeScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 32),
-
             const Text(
               'When enabled, vertical children stretch to fill '
               'the available horizontal space.',
             ),
-
             const SizedBox(height: 24),
-
             BreakifyAdaptativeLayout(
               breakpoint: BreakifyBreakpoint.md,
               spacing: spacing,

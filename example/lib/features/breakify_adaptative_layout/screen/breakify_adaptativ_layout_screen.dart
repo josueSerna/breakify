@@ -30,7 +30,6 @@ class BreakifyAdaptativLayoutScreen extends StatelessWidget {
             icon: Icons.view_agenda,
             page: BasicAdaptativeScreen(),
           ),
-
           ExampleCard(
             title: 'Distribute Evenly',
             description:

@@ -138,9 +138,7 @@ class BreakifyResponsiveGrid extends StatelessWidget {
 
         final isUnboundedHeight = constraints.maxHeight.isInfinite;
         final effectivePhysics = physics ??
-            (isUnboundedHeight
-                ? const NeverScrollableScrollPhysics()
-                : null);
+            (isUnboundedHeight ? const NeverScrollableScrollPhysics() : null);
         final effectiveShrinkWrap = shrinkWrap || isUnboundedHeight;
 
         if (equalHeight) {

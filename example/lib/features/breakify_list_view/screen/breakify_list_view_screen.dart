@@ -21,23 +21,17 @@ class BreakifyListViewScreen extends StatelessWidget {
               'BreakifyListView',
               style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 8),
-
             const Text(
               'A responsive list view with spacing and '
               'custom separator support.',
             ),
-
             const SizedBox(height: 24),
-
             Text(
               'Current breakpoint: '
               '${context.breakpoint.name.toUpperCase()}',
             ),
-
             const SizedBox(height: 32),
-
             ExampleCard(
               title: 'Spacing ListView',
               description:
@@ -46,7 +40,6 @@ class BreakifyListViewScreen extends StatelessWidget {
               icon: Icons.format_list_bulleted,
               page: ListViewSpacingScreen(),
             ),
-
             ExampleCard(
               title: 'Separator ListView',
               description:
@@ -55,11 +48,9 @@ class BreakifyListViewScreen extends StatelessWidget {
               icon: Icons.format_list_bulleted,
               page: SeparatorListViewScreen(),
             ),
-
             ExampleCard(
               title: 'Horizontal ListView',
-              description:
-                  'Creates a horizontally scrolling list while '
+              description: 'Creates a horizontally scrolling list while '
                   'maintaining responsive spacing between items.',
               icon: Icons.view_carousel,
               page: HorizontalListViewScreen(),

@@ -35,9 +35,7 @@ class ExampleCard extends StatelessWidget {
                 ),
                 child: Icon(icon, size: 28),
               ),
-
               const SizedBox(width: 16),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,16 +47,12 @@ class ExampleCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
                     const SizedBox(height: 6),
-
                     Text(description),
                   ],
                 ),
               ),
-
               const SizedBox(width: 12),
-
               const Icon(Icons.arrow_forward_ios),
             ],
           ),

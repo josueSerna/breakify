@@ -18,36 +18,28 @@ class BreakifyGridScreen extends StatelessWidget {
             'BreakifyGrid',
             style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
           ),
-
           const SizedBox(height: 8),
-
           const Text(
             'Explore the different ways BreakifyGrid '
             'can adapt to responsive layouts.',
           ),
-
           const SizedBox(height: 32),
-
           ExampleCard(
             title: 'Basic Grid',
             description: 'Responsive columns, spacing and child aspect ratio.',
             icon: Icons.grid_view,
             page: BasicGridScreen(),
           ),
-
           ExampleCard(
             title: 'Equal Height',
-            description:
-                'Makes all items in the same row have the height '
+            description: 'Makes all items in the same row have the height '
                 'of the tallest item.',
             icon: Icons.height,
             page: EqualHeightGridScreen(),
           ),
-
           ExampleCard(
             title: 'Horizontal Scroll',
-            description:
-                'Makes all items in the same row have the height '
+            description: 'Makes all items in the same row have the height '
                 'of the tallest item.',
             icon: Icons.height,
             page: HorizontalGridScreen(),

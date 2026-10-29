@@ -39,7 +39,6 @@ class BreakifyContainerScreen extends StatelessWidget {
               width: context.breakifyWidth,
             ),
             const SizedBox(height: 32),
-
             BreakifyContainer(
               maxWidth: maxWidth,
               padding: padding,
@@ -65,24 +64,19 @@ class BreakifyContainerScreen extends StatelessWidget {
                       'A responsive container that limits the maximum '
                       'width of your content and keeps it centered.',
                     ),
-
                     const SizedBox(height: 32),
-
                     InfoRow(
                       label: 'Breakpoint',
                       value: context.breakpoint.name.toUpperCase(),
                     ),
-
                     InfoRow(
                       label: 'Available width',
                       value: '${context.breakifyWidth.toStringAsFixed(0)} px',
                     ),
-
                     InfoRow(
                       label: 'Max width',
                       value: _resolveMaxWidth(context),
                     ),
-
                     InfoRow(
                       label: 'Border radius',
                       value: '${resolvedRadius.toStringAsFixed(1)} px',
