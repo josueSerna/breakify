@@ -168,6 +168,7 @@ class BreakifyNavbar extends StatefulWidget {
 class _BreakifyNavbarState extends State<BreakifyNavbar>
     with TickerProviderStateMixin {
   late final AnimationController _menu;
+  late final CurvedAnimation _drawerAnimation;
   late final BreakifyNavbarScrollDriver _scroll;
   bool _menuOpen = false;
 
@@ -176,6 +177,10 @@ class _BreakifyNavbarState extends State<BreakifyNavbar>
     super.initState();
     _menu =
         AnimationController(vsync: this, duration: widget.animationDuration);
+    _drawerAnimation = CurvedAnimation(
+      parent: _menu,
+      curve: Curves.easeInOut,
+    );
     _scroll = BreakifyNavbarScrollDriver(
       vsync: this,
       behavior: widget.scrollBehavior,
@@ -207,6 +212,7 @@ class _BreakifyNavbarState extends State<BreakifyNavbar>
 
   @override
   void dispose() {
+    _drawerAnimation.dispose();
     _menu.dispose();
     _scroll.dispose();
     super.dispose();
@@ -336,7 +342,7 @@ class _BreakifyNavbarState extends State<BreakifyNavbar>
         Positioned.fill(
           child: !desktop && isDrawer
               ? BreakifyNavbarDrawer(
-                  animation: _menu,
+                  animation: _drawerAnimation,
                   items: widget.items,
                   side: widget.drawerSide,
                   width: widget.drawerWidth,

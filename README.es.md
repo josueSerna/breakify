@@ -60,6 +60,7 @@
   - [BreakifyListView](#breakifylistview)
   - [BreakifyContainer](#breakifycontainer)
   - [BreakifySection (experimental)](#breakifysection-experimental)
+  - [BreakifyNavbar (experimental)](#breakifynavbar-experimental)
   - [BreakifyVisibility](#breakifyvisibility)
   - [BreakifyBuilder](#breakifybuilder)
   - [BreakifyDebugBanner](#breakifydebugbanner)
@@ -199,6 +200,7 @@ La lógica responsiva se mantiene centralizada, haciendo tus widgets más fácil
 * Listas responsivas (verticales y horizontales)
 * Layouts de panel principal y paneles secundarios
 * Secciones de página experimentales (`BreakifySection`)
+* Navbar responsivo experimental (`BreakifyNavbar`)
 * Visibilidad condicional según breakpoint, global o local
 * Banner de breakpoint configurable para desarrollo
 
@@ -217,7 +219,7 @@ Agrega Breakify a tu `pubspec.yaml`.
 
 ```yaml
 dependencies:
-  breakify: ^0.2.2
+  breakify: ^0.3.0
 ```
 
 Luego importa el paquete.
@@ -615,6 +617,56 @@ BreakifySection(
 el mayor. La sección crece cuando su contenido lo necesita y no crea scroll
 propio, así que colócala dentro de un `ListView` o `SingleChildScrollView`.
 Requiere un `BreakifyScope`.
+
+---
+
+### BreakifyNavbar (experimental)
+
+> **Experimental en 0.3.0:** su API podría cambiar en próximas versiones.
+
+Navbar responsivo. Desde el `breakpoint` (por defecto `md`) las opciones se
+muestran en horizontal; por debajo, un botón hamburguesa abre un menú
+`dropdown` o `drawer`.
+
+```dart
+BreakifyNavbar(
+  logo: Image.asset('assets/logo.png', height: 32),
+  items: [
+    BreakifyNavbarItem(label: 'Inicio', icon: Icons.home, onTap: () {}),
+    BreakifyNavbarItem(label: 'Servicios', icon: Icons.work, onTap: () {}),
+    BreakifyNavbarItem(label: 'Contacto', onTap: () {}, enabled: false),
+  ],
+  menuType: BreakifyNavbarMenuType.drawer,
+  drawerSide: BreakifyNavbarDrawerSide.right,
+  scrollBehavior: BreakifyNavbarScrollBehavior.hideOnScroll,
+  body: ListView(children: [/* contenido de la página */]),
+)
+```
+
+- `menuType`: `dropdown` (se despliega bajo el navbar) o `drawer` (panel
+  lateral sobre el contenido; se cierra tocando fuera, con el icono de cierre
+  o al elegir una opción).
+- `scrollBehavior`: `fixed` (siempre visible, por defecto), `static` (se va
+  con el contenido) o `hideOnScroll` (se oculta al bajar y vuelve al subir;
+  `scrollThreshold` define la sensibilidad).
+- También configurable: `logo`, `menuIcon`, `closeIcon`, `backgroundColor`,
+  `foregroundColor`, `menuBackgroundColor`, `height`, `padding`,
+  `itemSpacing`, `drawerWidth`, `drawerOverlayColor`, `animationDuration`
+  y `elevation`.
+
+Limitaciones conocidas:
+
+- Requiere un `BreakifyScope` y un ancestro Material.
+- Envuelve el contenido de la página en `body`. Escucha las notificaciones de
+  scroll de `body` y nunca usa un `ScrollController`.
+- Con `fixed` y `hideOnScroll` el body se coloca debajo del navbar. Con
+  `static` el navbar se superpone al body, que debe aplicar el padding
+  superior (`MediaQuery.paddingOf(context).top`) si usa un `padding` propio,
+  `SingleChildScrollView` o `CustomScrollView`.
+- `static` y `hideOnScroll` necesitan un scrollable vertical de nivel
+  superior en `body`.
+- Las opciones de escritorio no hacen scroll: demasiadas opciones desbordan.
+- El botón atrás de Android no cierra el menú móvil.
 
 ---
 

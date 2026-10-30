@@ -118,100 +118,93 @@ class BreakifyNavbarDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: animation,
-      builder: (context, _) {
+      builder: (context, child) {
         if (animation.isDismissed) return const SizedBox.shrink();
 
-        final curved = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeInOut,
-        );
         final isLeft = side == BreakifyNavbarDrawerSide.left;
 
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            final drawerWidth =
-                width.clamp(0.0, constraints.maxWidth * 0.85).toDouble();
-
-            return Stack(
-              children: [
-                Positioned.fill(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: onClose,
-                    child: FadeTransition(
-                      opacity: curved,
-                      child: ColoredBox(color: overlayColor),
-                    ),
-                  ),
+        return Stack(
+          children: [
+            Positioned.fill(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: onClose,
+                child: FadeTransition(
+                  opacity: animation,
+                  child: ColoredBox(color: overlayColor),
                 ),
-                Align(
-                  alignment:
-                      isLeft ? Alignment.centerLeft : Alignment.centerRight,
-                  child: SlideTransition(
-                    position: Tween(
-                      begin: Offset(isLeft ? -1 : 1, 0),
-                      end: Offset.zero,
-                    ).animate(curved),
-                    child: SizedBox(
-                      width: drawerWidth,
-                      height: double.infinity,
-                      child: Material(
-                        color: backgroundColor,
-                        elevation: 16,
-                        child: SafeArea(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: Row(
-                                  children: [
-                                    if (logo != null)
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            left: 8,
-                                          ),
-                                          child: Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: logo,
-                                          ),
-                                        ),
-                                      )
-                                    else
-                                      const Spacer(),
-                                    IconButton(
-                                      onPressed: onClose,
-                                      color: foregroundColor,
-                                      tooltip: MaterialLocalizations.of(context)
-                                          .closeButtonTooltip,
-                                      icon: Icon(closeIcon),
-                                    ),
-                                  ],
+              ),
+            ),
+            Align(
+              alignment: isLeft ? Alignment.centerLeft : Alignment.centerRight,
+              child: SlideTransition(
+                position: Tween(
+                  begin: Offset(isLeft ? -1 : 1, 0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              ),
+            ),
+          ],
+        );
+      },
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final drawerWidth =
+              width.clamp(0.0, constraints.maxWidth * 0.85).toDouble();
+
+          return SizedBox(
+            width: drawerWidth,
+            height: double.infinity,
+            child: Material(
+              color: backgroundColor,
+              elevation: 16,
+              child: SafeArea(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Row(
+                        children: [
+                          if (logo != null)
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 8),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: logo,
                                 ),
                               ),
-                              Expanded(
-                                child: SingleChildScrollView(
-                                  child: BreakifyNavbarMenuItems(
-                                    items: items,
-                                    foregroundColor: foregroundColor,
-                                    onSelected: onSelected,
-                                  ),
-                                ),
-                              ),
-                            ],
+                            )
+                          else
+                            const Spacer(),
+                          IconButton(
+                            onPressed: onClose,
+                            color: foregroundColor,
+                            tooltip: MaterialLocalizations.of(context)
+                                .closeButtonTooltip,
+                            icon: Icon(closeIcon),
                           ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: BreakifyNavbarMenuItems(
+                          items: items,
+                          foregroundColor: foregroundColor,
+                          onSelected: onSelected,
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            );
-          },
-        );
-      },
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
