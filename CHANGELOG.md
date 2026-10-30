@@ -1,4 +1,7 @@
-# Unreleased
+# 0.3.0
+
+Breakify 0.3.0 contains breaking changes in the grid widgets and introduces
+the experimental `BreakifyNavbar`.
 
 ## Breaking changes
 
@@ -13,6 +16,11 @@
 
 ## Added
 
+- `BreakifyNavbar` (**experimental**, API may change): responsive navbar that
+  shows its items inline from a breakpoint and a hamburger menu below it, with
+  `BreakifyNavbarItem`, `BreakifyNavbarMenuType` (`dropdown`, `drawer`),
+  `BreakifyNavbarScrollBehavior` (`static`, `fixed`, `hideOnScroll`) and
+  `BreakifyNavbarDrawerSide`. See the class documentation for limitations.
 - `BreakifyHeightMode.equal`: every item has exactly the same height, the
   tallest of the whole grid. `Spacer` and `Expanded` are supported.
 - `BreakifyHeightMode.equalInRow`: every item in a row matches that row's

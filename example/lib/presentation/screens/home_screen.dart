@@ -3,6 +3,7 @@ import 'package:example/features/breakify_adaptative_layout/screen/breakify_adap
 import 'package:example/features/breakify_container/screen/breakify_container_screen.dart';
 import 'package:example/features/breakify_grid/screen/breakify_grid_screen.dart';
 import 'package:example/features/breakify_list_view/screen/breakify_list_view_screen.dart';
+import 'package:example/features/breakify_navbar/screen/breakify_navbar_screen.dart';
 import 'package:example/features/breakify_panel_layout/screen/breakify_panel_layout_screen.dart';
 import 'package:example/features/breakify_responsive_grid/screen/breakify_responsive_grid_screen.dart';
 import 'package:example/features/breakify_section/screen/breakify_section_screen.dart';
@@ -91,6 +92,13 @@ class HomeScreen extends StatelessWidget {
                 'using ranges or specific breakpoint values.',
             icon: Icons.visibility,
             page: BreakifyVisibilityScreen(),
+          ),
+          ExampleCard(
+            title: 'BreakifyNavbar (experimental)',
+            description: 'Responsive navbar with dropdown or drawer menu '
+                'and configurable scroll behavior.',
+            icon: Icons.menu_open,
+            page: BreakifyNavbarScreen(),
           ),
         ],
       ),
