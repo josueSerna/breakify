@@ -148,62 +148,64 @@ class BreakifyNavbarDrawer extends StatelessWidget {
           ],
         );
       },
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final drawerWidth =
-              width.clamp(0.0, constraints.maxWidth * 0.85).toDouble();
+      child: RepaintBoundary(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final drawerWidth =
+                width.clamp(0.0, constraints.maxWidth * 0.85).toDouble();
 
-          return SizedBox(
-            width: drawerWidth,
-            height: double.infinity,
-            child: Material(
-              color: backgroundColor,
-              elevation: 16,
-              child: SafeArea(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Row(
-                        children: [
-                          if (logo != null)
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 8),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: logo,
+            return SizedBox(
+              width: drawerWidth,
+              height: double.infinity,
+              child: Material(
+                color: backgroundColor,
+                elevation: 16,
+                child: SafeArea(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Row(
+                          children: [
+                            if (logo != null)
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: logo,
+                                  ),
                                 ),
-                              ),
-                            )
-                          else
-                            const Spacer(),
-                          IconButton(
-                            onPressed: onClose,
-                            color: foregroundColor,
-                            tooltip: MaterialLocalizations.of(context)
-                                .closeButtonTooltip,
-                            icon: Icon(closeIcon),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: BreakifyNavbarMenuItems(
-                          items: items,
-                          foregroundColor: foregroundColor,
-                          onSelected: onSelected,
+                              )
+                            else
+                              const Spacer(),
+                            IconButton(
+                              onPressed: onClose,
+                              color: foregroundColor,
+                              tooltip: MaterialLocalizations.of(context)
+                                  .closeButtonTooltip,
+                              icon: Icon(closeIcon),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ],
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: BreakifyNavbarMenuItems(
+                            items: items,
+                            foregroundColor: foregroundColor,
+                            onSelected: onSelected,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

@@ -288,7 +288,7 @@ class _BreakifyNavbarState extends State<BreakifyNavbar>
         Positioned.fill(
           child: NotificationListener<ScrollNotification>(
             onNotification: (n) => _scroll.onNotification(n, extent),
-            child: _buildBody(media, extent),
+            child: RepaintBoundary(child: _buildBody(media, extent)),
           ),
         ),
         Positioned.fill(
@@ -309,22 +309,26 @@ class _BreakifyNavbarState extends State<BreakifyNavbar>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                BreakifyNavbarBar(
-                  items: widget.items,
-                  desktop: desktop,
-                  menuOpen: _menuOpen && !isDrawer,
-                  onMenuPressed: _toggleMenu,
-                  logo: widget.logo,
-                  height: widget.height,
-                  topInset: topInset,
-                  padding: widget.padding,
-                  itemSpacing: widget.itemSpacing,
-                  backgroundColor: background,
-                  foregroundColor: foreground,
-                  elevation: widget.elevation,
-                  menuIcon: widget.menuIcon,
-                  closeIcon: widget.closeIcon,
-                  animationDuration: widget.animationDuration,
+                // Keeps the bar (logo, shadow) in its own layer so moving it
+                // or scrolling the body does not repaint it every frame.
+                RepaintBoundary(
+                  child: BreakifyNavbarBar(
+                    items: widget.items,
+                    desktop: desktop,
+                    menuOpen: _menuOpen && !isDrawer,
+                    onMenuPressed: _toggleMenu,
+                    logo: widget.logo,
+                    height: widget.height,
+                    topInset: topInset,
+                    padding: widget.padding,
+                    itemSpacing: widget.itemSpacing,
+                    backgroundColor: background,
+                    foregroundColor: foreground,
+                    elevation: widget.elevation,
+                    menuIcon: widget.menuIcon,
+                    closeIcon: widget.closeIcon,
+                    animationDuration: widget.animationDuration,
+                  ),
                 ),
                 if (!desktop && !isDrawer)
                   BreakifyNavbarDropdown(
