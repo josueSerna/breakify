@@ -1,5 +1,6 @@
 import 'package:example/features/breakify_adaptative_layout/screen/basic_adaptative_screen.dart';
 import 'package:example/features/breakify_adaptative_layout/screen/distribute_adaptative_screen.dart';
+import 'package:example/features/breakify_adaptative_layout/screen/order_adaptative_screen.dart';
 import 'package:example/presentation/widgets/example_card.dart';
 import 'package:flutter/material.dart';
 
@@ -36,6 +37,13 @@ class BreakifyAdaptativLayoutScreen extends StatelessWidget {
                 'Makes children share the available horizontal space equally.',
             icon: Icons.view_column,
             page: DistributeAdaptativeScreen(),
+          ),
+          ExampleCard(
+            title: 'Layout Order',
+            description:
+                'Rearranges children with templates: twoRows to twoColumns.',
+            icon: Icons.dashboard_customize,
+            page: OrderAdaptativeScreen(),
           ),
         ],
       ),

@@ -18,6 +18,8 @@ export 'src/values/breakify_value.dart';
 export 'src/widgets/breakify_adaptative_layout.dart';
 export 'src/widgets/breakify_container.dart';
 export 'src/widgets/breakify_debug_banner.dart';
+export 'src/widgets/breakify_layout_order.dart';
+export 'src/widgets/breakify_layout_template.dart';
 export 'src/widgets/breakify_grid.dart';
 export 'src/widgets/breakify_list_view.dart';
 export 'src/widgets/breakify_navbar.dart';

@@ -16,6 +16,18 @@ the experimental `BreakifyNavbar`.
 
 ## Added
 
+- `BreakifyAdaptativeLayout.order`: optional `BreakifyLayoutOrder` with
+  `layoutBelow` / `layoutAbove` distributions chosen from the configured
+  `breakpoint`. Templates (`BreakifyLayoutTemplate`): `inRow`, `inColumn`,
+  `twoRows`, `twoColumns` and `custom(left:, right:)`, which uses indices of
+  the original `children` list. Two-group templates split children in order:
+  the first `ceil(n / 2)` in the first group. Invalid `custom` indices
+  (out of range, repeated, missing, empty groups) throw in debug mode. When
+  `order` is `null` the behavior is unchanged. Known limitation: group
+  heights are not equalized, so a child in a shorter group (e.g. an image)
+  keeps its own height unless it sizes itself, optionally with
+  `crossAxisAlignment: CrossAxisAlignment.stretch`.
+- Example screen "Layout Order" for `BreakifyAdaptativeLayout`.
 - Added the opt-in `childScale` property to the experimental `BreakifySection`
   to visually scale its child without changing its layout size.
 - `BreakifyNavbar.logoMaxHeight` (default 80): the logo is no longer
