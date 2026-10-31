@@ -57,7 +57,7 @@ class OrderAdaptativeScreen extends StatelessWidget {
                 layoutBelow: BreakifyLayoutTemplate.inColumn,
                 layoutAbove: BreakifyLayoutTemplate.custom(
                   left: [2, 1],
-                  right: [0, 3],
+                  right: [0],
                 ),
               ),
               children: const [
