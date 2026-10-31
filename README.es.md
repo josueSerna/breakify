@@ -594,20 +594,26 @@ BreakifyContainer(
 
 ### BreakifySection (experimental)
 
-> **Experimental en 0.2.2:** su API podría cambiar en próximas versiones.
+> **Experimental en 0.3.0:** su API podría cambiar en próximas versiones.
 
 Sección de ancho completo para páginas web y landing pages. Admite fondo,
-alineación, `padding` y `minHeight` responsivos, y `fullViewport`.
+alineación, `padding` y `minHeight` responsivos, y `fullViewport`. Usa
+`childScale` para agrandar o reducir visualmente el contenido sin cambiar el
+espacio que reserva el layout; puede ser útil para escalar un logo en el
+footer. La sección no recorta el contenido que sobresale al escalarlo, aunque
+un widget ancestro sí podría hacerlo.
 
 ```dart
 BreakifySection(
   backgroundColor: Colors.indigo.shade50,
-  fullViewport: true,
+  minHeight: const BreakifyValue(sm: 130),
+  childScale: 2,
+  alignment: Alignment.centerRight,
   padding: const BreakifyValue<EdgeInsetsGeometry>(
     sm: EdgeInsets.all(16),
     lg: EdgeInsets.symmetric(horizontal: 96, vertical: 48),
   ),
-  child: const BreakifyContainer(child: Hero()),
+  child: const FlutterLogo(size: 64),
 )
 ```
 

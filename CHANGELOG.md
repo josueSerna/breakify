@@ -16,6 +16,8 @@ the experimental `BreakifyNavbar`.
 
 ## Added
 
+- Added the opt-in `childScale` property to the experimental `BreakifySection`
+  to visually scale its child without changing its layout size.
 - `BreakifyNavbar` (**experimental**, API may change): responsive navbar that
   shows its items inline from a breakpoint and a hamburger menu below it, with
   `BreakifyNavbarItem`, `BreakifyNavbarMenuType` (`dropdown`, `drawer`),

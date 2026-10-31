@@ -587,21 +587,25 @@ BreakifyContainer(
 
 ### BreakifySection (experimental)
 
-> **Experimental in 0.2.2:** its API may change in future releases.
+> **Experimental in 0.3.0:** its API may change in future releases.
 
 A full-width section for web pages and landing pages. It supports a
 background, alignment, responsive `padding` and `minHeight`, and
-`fullViewport`.
+`fullViewport`. Set `childScale` to visually enlarge or shrink its child
+without changing the space reserved for it; this can help scale a footer logo.
+The section does not clip scaled overflow, though an ancestor may do so.
 
 ```dart
 BreakifySection(
   backgroundColor: Colors.indigo.shade50,
-  fullViewport: true,
+  minHeight: const BreakifyValue(sm: 130),
+  childScale: 2,
+  alignment: Alignment.centerRight,
   padding: const BreakifyValue<EdgeInsetsGeometry>(
     sm: EdgeInsets.all(16),
     lg: EdgeInsets.symmetric(horizontal: 96, vertical: 48),
   ),
-  child: const BreakifyContainer(child: Hero()),
+  child: const FlutterLogo(size: 64),
 )
 ```
 
