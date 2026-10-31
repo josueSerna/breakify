@@ -5,7 +5,7 @@ import '../values/breakify_resolvable.dart';
 
 /// A full-width section for building web pages and landing pages.
 ///
-/// **Experimental:** `BreakifySection` is experimental in version 0.2.3 and
+/// **Experimental:** `BreakifySection` is experimental in version 0.3.0 and
 /// its API may change in future releases.
 ///
 /// The section spans the available width, can paint a [backgroundColor],
@@ -16,6 +16,8 @@ import '../values/breakify_resolvable.dart';
 /// [padding] and [minHeight] are resolved with the current breakpoint, so
 /// they can be responsive by using [BreakifyValue] or [BreakifyFluidValue].
 /// The padding is included in the minimum height.
+/// Set [childScale] to visually scale the child without changing the space
+/// reserved for it by the layout.
 ///
 /// This widget does not scroll. Place it inside a scrollable such as a
 /// [SingleChildScrollView] or [ListView] to build a page.
@@ -30,6 +32,7 @@ import '../values/breakify_resolvable.dart';
 ///     sm: EdgeInsets.all(16),
 ///     lg: EdgeInsets.symmetric(horizontal: 64, vertical: 32),
 ///   ),
+///   childScale: 1.5,
 ///   child: const BreakifyContainer(child: Hero()),
 /// )
 /// ```
@@ -64,6 +67,15 @@ class BreakifySection extends StatelessWidget {
   /// grow beyond the viewport height.
   final bool fullViewport;
 
+  /// Visual scale applied to the child.
+  ///
+  /// This does not change the space reserved for the child, so values greater
+  /// than `1` may paint outside the section's layout bounds. The section does
+  /// not clip this overflow; an ancestor may still do so.
+  ///
+  /// Defaults to `1`, which preserves the child's original size.
+  final double childScale;
+
   /// Creates an experimental responsive page section.
   const BreakifySection({
     super.key,
@@ -73,7 +85,8 @@ class BreakifySection extends StatelessWidget {
     this.padding,
     this.minHeight,
     this.fullViewport = false,
-  });
+    this.childScale = 1,
+  }) : assert(childScale > 0);
 
   @override
   Widget build(BuildContext context) {
@@ -91,10 +104,13 @@ class BreakifySection extends StatelessWidget {
             ? resolvedMinHeight
             : viewportHeight;
 
+        final scaledChild = childScale == 1
+            ? child
+            : Transform.scale(scale: childScale, child: child);
         Widget content = Align(
           alignment: alignment,
           heightFactor: 1,
-          child: child,
+          child: scaledChild,
         );
 
         if (padding != null) {

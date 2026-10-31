@@ -41,6 +41,7 @@
 
 ## Table of Contents
 
+- [Latest Important Updates](#latest-important-updates)
 - [What is Breakify?](#what-is-breakify)
 - [Why Breakify?](#why-breakify)
 - [Features](#features)
@@ -59,6 +60,7 @@
   - [BreakifyListView](#breakifylistview)
   - [BreakifyContainer](#breakifycontainer)
   - [BreakifySection (experimental)](#breakifysection-experimental)
+  - [BreakifyNavbar (experimental)](#breakifynavbar-experimental)
   - [BreakifyVisibility](#breakifyvisibility)
   - [BreakifyBuilder](#breakifybuilder)
   - [BreakifyDebugBanner](#breakifydebugbanner)
@@ -67,6 +69,60 @@
 - [Contributing](#contributing)
 - [License](#license)
 - [Author](#author)
+
+---
+
+## Latest Important Updates
+
+### `heightMode` replaces `equalHeight` in `BreakifyGrid` and `BreakifyResponsiveGrid`
+
+> **Breaking change.** The `equalHeight` boolean no longer exists. It is
+> replaced by `heightMode`, a nullable `BreakifyHeightMode` enum that lets you
+> choose *how* item heights are calculated.
+
+| `heightMode` | Behavior | `Spacer` / `Expanded` | Loading |
+|---|---|---|---|
+| `null` (default) | Items are sized from `childAspectRatio` | n/a | Lazy |
+| `BreakifyHeightMode.equal` | Every item has exactly the same height: the tallest item of the whole grid | Supported | Rows are measured once and cached; only visible rows stay alive |
+| `BreakifyHeightMode.equalInRow` | Every item in a row has the height of that row's tallest item. Rows can differ from each other | Supported | Lazy |
+| `BreakifyHeightMode.natural` | Every item keeps its natural height, aligned to the top of its row | Not supported (unbounded height) | Lazy |
+
+When `heightMode` is not `null`, `childAspectRatio` is ignored and heights come
+from the content. It currently only supports `Axis.vertical` in
+`BreakifyGrid`, and children must support intrinsic measurement (widgets such
+as `LayoutBuilder` are not supported).
+
+**Migration**
+
+```dart
+// Before
+BreakifyGrid(
+  columns: const BreakifyValue(sm: 1, md: 2, lg: 3),
+  equalHeight: true,
+  children: cards,
+)
+
+// After (same behavior as the old `equalHeight: true`)
+BreakifyGrid(
+  columns: const BreakifyValue(sm: 1, md: 2, lg: 3),
+  heightMode: BreakifyHeightMode.equalInRow,
+  children: cards,
+)
+```
+
+`equalHeight: false` becomes `heightMode: null` (or simply omit it).
+
+**Choosing a mode**
+
+* Use `equalInRow` for long or scrollable lists: it is lazy and cheap.
+* Use `equal` when every card must look identical across rows. Its first
+  layout and every width change measure all cards, so prefer it for up to a
+  few hundred items.
+* Use `natural` when cards should keep their own size. Do not put `Spacer` or
+  `Expanded` inside their `Column`; use `mainAxisSize: MainAxisSize.min`.
+
+`BreakifyHeightMode` is exported from `package:breakify/breakify.dart`. See
+the [CHANGELOG](CHANGELOG.md) for details.
 
 ---
 
@@ -144,6 +200,7 @@ The responsive logic stays centralized, making your widgets easier to read, main
 * Responsive list views (vertical and horizontal)
 * Main-and-secondary panel layouts
 * Experimental page sections (`BreakifySection`)
+* Experimental responsive navbar (`BreakifyNavbar`)
 * Conditional visibility by breakpoint, globally or locally
 * Development breakpoint banner with configurable position
 
@@ -162,7 +219,7 @@ Add Breakify to your `pubspec.yaml`.
 
 ```yaml
 dependencies:
-  breakify: ^0.2.2
+  breakify: ^0.3.0
 ```
 
 Then import the package.
@@ -350,6 +407,54 @@ BreakifyAdaptativeLayout(
 `CrossAxisAlignment.stretch` to the vertical layout. Spacing can be a
 `BreakifyValue` or a `BreakifyFluidValue`.
 
+#### Custom distributions with `order`
+
+`order` is optional. Without it, the layout behaves exactly as shown above.
+When set, `layoutBelow` is used below `breakpoint` and `layoutAbove` from
+`breakpoint` onward.
+
+```dart
+BreakifyAdaptativeLayout(
+  breakpoint: BreakifyBreakpoint.lg,
+  spacing: const BreakifyFluidValue(sm: 12, lg: 24),
+  children: [Title(), Description(), Image()],
+  order: const BreakifyLayoutOrder(
+    layoutBelow: BreakifyLayoutTemplate.twoRows,
+    layoutAbove: BreakifyLayoutTemplate.twoColumns,
+  ),
+)
+```
+
+| Template | Result |
+|---|---|
+| `inRow` | All children in one row. |
+| `inColumn` | All children in one column. |
+| `twoRows` | Two rows, one below the other. |
+| `twoColumns` | Two columns, side by side. |
+| `custom(left:, right:)` | Two columns with explicit children. |
+
+For `twoRows` and `twoColumns`, the first `ceil(n / 2)` children go in the
+first group (top row / left column) and the rest in the second. With three
+children: `[0, 1]` and `[2]`.
+
+With `custom`, the indices refer to positions in the original `children`
+list (`0` = `Title()`, `1` = `Description()`, `2` = `Image()`):
+
+```dart
+order: const BreakifyLayoutOrder(
+  layoutBelow: BreakifyLayoutTemplate.inColumn,
+  layoutAbove: BreakifyLayoutTemplate.custom(
+    left: [0, 1],
+    right: [2],
+  ),
+),
+```
+
+Every child must appear exactly once and neither list may be empty;
+otherwise an error is thrown in debug mode. Groups are not height-equalized:
+a child alone in a group (such as an image) keeps its own height unless it
+sizes itself.
+
 ---
 
 ### BreakifyGrid
@@ -383,13 +488,18 @@ It also supports:
   scroll sideways instead of vertically. In this mode, `columns` controls
   the number of rows instead of columns, and `childAspectRatio` is still
   expressed as width / height.
-* **Equal-height rows** — set `equalHeight: true` to make every item in a
-  row match the height of the tallest item in that row. Useful for grids
-  with items of varying intrinsic height. The row height is measured once
-  and items receive that exact height, so `Spacer` and `Expanded` inside a
-  `Column` work. Children must support intrinsic measurement (for example,
-  `LayoutBuilder` is not supported). Currently only supported with
-  `Axis.vertical`.
+* **Height modes** — set `heightMode` (a `BreakifyHeightMode`) to size items
+  from their content instead of `childAspectRatio`, which is then ignored.
+  * `BreakifyHeightMode.equal`: every item has the same height (the tallest
+    of the whole grid).
+  * `BreakifyHeightMode.equalInRow`: items in each row match that row's
+    tallest item; rows may differ.
+  * `BreakifyHeightMode.natural`: each item keeps its own height.
+
+  Heights are measured once, so `Spacer` and `Expanded` inside a `Column`
+  work (except with `natural`). Children must support intrinsic measurement
+  (`LayoutBuilder` is not supported). Currently only supported with
+  `Axis.vertical`. See [Latest Important Updates](#latest-important-updates).
 
 ```dart
 BreakifyGrid(
@@ -429,16 +539,17 @@ while at least one column is always used. Unlike `BreakifyGrid`, this widget
 does not require a value for each breakpoint and responds to the local width
 provided by its parent.
 
-Set `equalHeight: true` to make items in each row match the height of the
-tallest item in that row. This is opt-in, ignores `childAspectRatio`, and
-sizes rows from their content without imposing a fixed height.
+Set `heightMode` (`BreakifyHeightMode.equal`, `equalInRow` or `natural`) to
+size items from their content. It is opt-in (`null` by default) and ignores
+`childAspectRatio`. See [Latest Important Updates](#latest-important-updates)
+for the behavior of each mode.
 
 ```dart
 BreakifyResponsiveGrid(
   minItemWidth: 220,
   maxColumns: 3,
   spacing: 16,
-  equalHeight: true,
+  heightMode: BreakifyHeightMode.equalInRow,
   children: [
     Card(child: Text('Short content')),
     Card(child: Text('Content that needs more vertical space.')),
@@ -472,6 +583,30 @@ the main panel and the secondary panel column are arranged horizontally.
 `secondaryPanels` is empty, the layout remains vertical. The breakpoint is
 resolved from the layout's available local width, so padding or parent
 constraints can make it differ from the global screen breakpoint.
+
+#### `reverse` and `secondaryDirection`
+
+Both only affect the horizontal layout (vertical mode is unchanged).
+
+```dart
+BreakifyPanelLayout(
+  breakpoint: BreakifyBreakpoint.lg,
+  spacing: const BreakifyFluidValue(sm: 12, lg: 24),
+  reverse: true,
+  secondaryDirection: Axis.horizontal,
+  mainPanel: MainContent(),
+  secondaryPanels: [SummaryCard(), ActionsCard()],
+)
+```
+
+- `reverse` (default `false`): with `true`, the secondary panels go on the
+  left and the main panel on the right. The order of `secondaryPanels` is
+  kept, and `mainFlex` / `secondaryFlex` still apply to their own area.
+- `secondaryDirection` (default `Axis.vertical`): with `Axis.horizontal`,
+  the secondary panels are placed in a `Row`, each with an equal share of the
+  width and separated by `spacing`. In that `Row`,
+  `CrossAxisAlignment.stretch` is applied as `start` because its height is
+  unbounded.
 
 ---
 
@@ -524,21 +659,25 @@ BreakifyContainer(
 
 ### BreakifySection (experimental)
 
-> **Experimental in 0.2.2:** its API may change in future releases.
+> **Experimental in 0.3.0:** its API may change in future releases.
 
 A full-width section for web pages and landing pages. It supports a
 background, alignment, responsive `padding` and `minHeight`, and
-`fullViewport`.
+`fullViewport`. Set `childScale` to visually enlarge or shrink its child
+without changing the space reserved for it; this can help scale a footer logo.
+The section does not clip scaled overflow, though an ancestor may do so.
 
 ```dart
 BreakifySection(
   backgroundColor: Colors.indigo.shade50,
-  fullViewport: true,
+  minHeight: const BreakifyValue(sm: 130),
+  childScale: 2,
+  alignment: Alignment.centerRight,
   padding: const BreakifyValue<EdgeInsetsGeometry>(
     sm: EdgeInsets.all(16),
     lg: EdgeInsets.symmetric(horizontal: 96, vertical: 48),
   ),
-  child: const BreakifyContainer(child: Hero()),
+  child: const FlutterLogo(size: 64),
 )
 ```
 
@@ -548,6 +687,59 @@ With `fullViewport: true` the minimum height is the viewport height
 value is used. The section grows when its content needs more room and does not
 scroll on its own, so place it inside a `ListView` or `SingleChildScrollView`.
 Requires a `BreakifyScope`.
+
+---
+
+### BreakifyNavbar (experimental)
+
+> **Experimental in 0.3.0:** its API may change in future releases.
+
+A responsive navbar. From the `breakpoint` up (default `md`) the items are
+laid out horizontally; below it, a hamburger button opens a `dropdown` or a
+`drawer` menu.
+
+```dart
+BreakifyNavbar(
+  logo: Image.asset('assets/logo.png', height: 32),
+  items: [
+    BreakifyNavbarItem(label: 'Home', icon: Icons.home, onTap: () {}),
+    BreakifyNavbarItem(label: 'Services', icon: Icons.work, onTap: () {}),
+    BreakifyNavbarItem(label: 'Contact', onTap: () {}, enabled: false),
+  ],
+  menuType: BreakifyNavbarMenuType.drawer,
+  drawerSide: BreakifyNavbarDrawerSide.right,
+  scrollBehavior: BreakifyNavbarScrollBehavior.hideOnScroll,
+  body: ListView(children: [/* page content */]),
+)
+```
+
+- `menuType`: `dropdown` (expands below the navbar) or `drawer` (side panel
+  over the content; closes by tapping outside, with the close icon, or by
+  selecting an item).
+- `scrollBehavior`: `fixed` (always visible, default), `static` (scrolls away
+  with the content) or `hideOnScroll` (hides when scrolling down, returns when
+  scrolling up; `scrollThreshold` sets the sensitivity).
+- Also configurable: `logo`, `menuIcon`, `closeIcon`, `backgroundColor`,
+  `foregroundColor`, `menuBackgroundColor`, `height`, `padding`,
+  `itemSpacing`, `drawerWidth`, `drawerOverlayColor`, `animationDuration`
+  and `elevation`.
+- `logoMaxHeight` (default 80): the logo is no longer squeezed into the bar
+  `height`; it can grow up to this value, centered, and paints beyond the bar
+  edges (not clipped) if it is taller than `height`.
+
+Known limitations:
+
+- Requires a `BreakifyScope` and a Material ancestor.
+- It wraps the page content in `body`. It listens to the scroll
+  notifications of `body` and never uses a `ScrollController`.
+- With `fixed` and `hideOnScroll` the body is placed below the navbar. With
+  `static` the navbar overlays the body, which must apply the top padding
+  (`MediaQuery.paddingOf(context).top`) if it uses a custom `padding`,
+  `SingleChildScrollView` or `CustomScrollView`.
+- `static` and `hideOnScroll` need a vertical scrollable as the top-level
+  scrollable of `body`.
+- Desktop items do not scroll: too many items overflow.
+- The Android back button does not close the mobile menu.
 
 ---
 

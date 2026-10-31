@@ -49,6 +49,14 @@ class BreakifySectionScreen extends StatelessWidget {
               ),
             ),
             BreakifySection(
+              backgroundColor: Colors.blueGrey.shade50,
+              minHeight: const BreakifyValue(sm: 130),
+              childScale: 2,
+              alignment: Alignment.centerRight,
+              padding: const BreakifyValue(sm: EdgeInsets.all(16)),
+              child: const FlutterLogo(size: 64),
+            ),
+            BreakifySection(
               backgroundColor: Colors.purple.shade50,
               fullViewport: true,
               child: const _Label(

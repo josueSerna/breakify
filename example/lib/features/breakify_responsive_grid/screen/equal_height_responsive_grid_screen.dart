@@ -46,16 +46,26 @@ class EqualHeightResponsiveGridScreen extends StatelessWidget {
     ),
   ];
 
-  Widget _grid({required bool equalHeight}) {
+  static final _plainCards = [
+    for (final card in _cards)
+      EqualHeightCard(
+        title: card.title,
+        description: card.description,
+        icon: card.icon,
+        color: card.color,
+      ),
+  ];
+
+  Widget _grid(BreakifyHeightMode? mode) {
     return BreakifyResponsiveGrid(
       minItemWidth: 260,
       maxColumns: 3,
       spacing: 16,
-      equalHeight: equalHeight,
+      heightMode: mode,
       childAspectRatio: 0.4,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      children: _cards,
+      children: mode == BreakifyHeightMode.natural ? _plainCards : _cards,
     );
   }
 
@@ -79,18 +89,32 @@ class EqualHeightResponsiveGridScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             const Text(
-              'equalHeight: true',
+              'BreakifyHeightMode.equal',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            _grid(equalHeight: true),
+            _grid(BreakifyHeightMode.equal),
             const SizedBox(height: 32),
             const Text(
-              'equalHeight: false (for comparison)',
+              'BreakifyHeightMode.equalInRow',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            _grid(equalHeight: false),
+            _grid(BreakifyHeightMode.equalInRow),
+            const SizedBox(height: 32),
+            const Text(
+              'BreakifyHeightMode.natural (no Spacer/Expanded)',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            _grid(BreakifyHeightMode.natural),
+            const SizedBox(height: 32),
+            const Text(
+              'heightMode: null (childAspectRatio)',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            _grid(null),
           ],
         ),
       ),

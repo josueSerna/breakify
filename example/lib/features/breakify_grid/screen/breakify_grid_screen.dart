@@ -1,6 +1,7 @@
 import 'package:example/features/breakify_grid/screen/basic_grid_screen.dart';
 import 'package:example/features/breakify_grid/screen/equal_height_grid_screen.dart';
 import 'package:example/features/breakify_grid/screen/horizontal_grid_screen.dart';
+import 'package:example/features/breakify_grid/screen/raw_equal_grid_screen.dart';
 import 'package:example/presentation/widgets/example_card.dart';
 import 'package:flutter/material.dart';
 
@@ -43,6 +44,13 @@ class BreakifyGridScreen extends StatelessWidget {
                 'of the tallest item.',
             icon: Icons.height,
             page: HorizontalGridScreen(),
+          ),
+          ExampleCard(
+            title: 'Raw Equal (experimental)',
+            description: 'BreakifyHeightMode.equal with unstyled, very uneven '
+                'cards and a configurable amount.',
+            icon: Icons.science,
+            page: RawEqualGridScreen(),
           ),
         ],
       ),

@@ -1,3 +1,6 @@
+import 'package:breakify/src/widgets/internal/breakify_height_mode.dart';
+import 'dart:math' as math;
+
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
@@ -12,6 +15,7 @@ class BreakifyEqualHeightGridLayout extends StatelessWidget {
   final ScrollCacheExtent? scrollCacheExtent;
   final bool reverse;
   final bool? primary;
+  final BreakifyHeightMode heightMode;
   final List<Widget> children;
 
   const BreakifyEqualHeightGridLayout(
@@ -26,6 +30,7 @@ class BreakifyEqualHeightGridLayout extends StatelessWidget {
       this.scrollCacheExtent,
       required this.reverse,
       this.primary,
+      required this.heightMode,
       required this.children});
 
   @override
@@ -34,24 +39,49 @@ class BreakifyEqualHeightGridLayout extends StatelessWidget {
 
     final rowCount = (children.length / safeColumns).ceil();
 
-    final sliver = SliverList.builder(
-        itemCount: rowCount,
-        itemBuilder: (context, rowIndex) {
-          final start = rowIndex * safeColumns;
-          final end = (start + safeColumns).clamp(0, children.length);
+    final Widget sliver;
+    if (heightMode == BreakifyHeightMode.equal) {
+      sliver = _EqualRowsSliver(
+        columns: safeColumns,
+        crossSpacing: crossSpacing,
+        mainSpacing: mainSpacing,
+        delegate: SliverChildBuilderDelegate(
+          (context, rowIndex) {
+            final start = rowIndex * safeColumns;
+            final end = (start + safeColumns).clamp(0, children.length);
+            return Padding(
+              padding: EdgeInsets.only(bottom: mainSpacing),
+              child: _BreakifyHeightGrid(
+                  columns: safeColumns,
+                  spacing: crossSpacing,
+                  mainSpacing: 0,
+                  mode: BreakifyHeightMode.equalInRow,
+                  children: children.sublist(start, end)),
+            );
+          },
+          childCount: rowCount,
+        ),
+        children: children,
+      );
+    } else {
+      sliver = SliverList.builder(
+          itemCount: rowCount,
+          itemBuilder: (context, rowIndex) {
+            final start = rowIndex * safeColumns;
+            final end = (start + safeColumns).clamp(0, children.length);
+            final isLastRow = rowIndex == rowCount - 1;
 
-          final rowChildren = children.sublist(start, end);
-
-          final isLastRow = rowIndex == rowCount - 1;
-
-          return Padding(
-            padding: EdgeInsets.only(bottom: isLastRow ? 0 : mainSpacing),
-            child: _BreakifyEqualHeightRow(
-                columns: safeColumns,
-                spacing: crossSpacing,
-                children: rowChildren),
-          );
-        });
+            return Padding(
+              padding: EdgeInsets.only(bottom: isLastRow ? 0 : mainSpacing),
+              child: _BreakifyHeightGrid(
+                  columns: safeColumns,
+                  spacing: crossSpacing,
+                  mainSpacing: 0,
+                  mode: heightMode,
+                  children: children.sublist(start, end)),
+            );
+          });
+    }
     final effectiveSliver = padding == null
         ? sliver
         : SliverPadding(
@@ -71,48 +101,155 @@ class BreakifyEqualHeightGridLayout extends StatelessWidget {
   }
 }
 
-/// Lays out up to [columns] children side by side, giving every child the
-/// same width and the same (tight) height.
+/// Fixed-extent sliver for [BreakifyHeightMode.equal].
 ///
-/// The row height is the largest max-intrinsic height among its children,
-/// measured at the final column width. The children are then laid out once
-/// with tight constraints, so `Expanded` and `Spacer` inside a `Column` always
-/// receive a bounded height, which unbounded measurement could not provide.
+/// The shared row extent is measured by building each row one at a time and
+/// discarding it, so only visible rows stay alive. The result is cached until
+/// the width, columns, spacing or children change.
+class _EqualRowsSliver extends SliverMultiBoxAdaptorWidget {
+  final List<Widget> children;
+  final int columns;
+  final double crossSpacing;
+  final double mainSpacing;
+
+  const _EqualRowsSliver({
+    required super.delegate,
+    required this.children,
+    required this.columns,
+    required this.crossSpacing,
+    required this.mainSpacing,
+  });
+
+  @override
+  RenderSliverMultiBoxAdaptor createRenderObject(BuildContext context) {
+    final element = context as SliverMultiBoxAdaptorElement;
+    return _RenderEqualRowsSliver(childManager: element)
+      ..update(children, columns, crossSpacing, mainSpacing);
+  }
+
+  @override
+  void updateRenderObject(
+      BuildContext context, _RenderEqualRowsSliver renderObject) {
+    renderObject.update(children, columns, crossSpacing, mainSpacing);
+  }
+}
+
+class _RenderEqualRowsSliver extends RenderSliverFixedExtentBoxAdaptor {
+  _RenderEqualRowsSliver({required super.childManager});
+
+  List<Widget> _children = const [];
+  int _columns = 1;
+  double _crossSpacing = 0;
+  double _mainSpacing = 0;
+  double? _measuredWidth;
+  double _extent = 0;
+
+  void update(
+      List<Widget> children, int columns, double crossSpacing, double main) {
+    var same = columns == _columns &&
+        crossSpacing == _crossSpacing &&
+        main == _mainSpacing &&
+        children.length == _children.length;
+    for (var i = 0; same && i < children.length; i++) {
+      same = identical(children[i], _children[i]);
+    }
+    _children = children;
+    if (!same) {
+      _columns = columns;
+      _crossSpacing = crossSpacing;
+      _mainSpacing = main;
+      _measuredWidth = null;
+    }
+  }
+
+  @override
+  double get itemExtent => _extent;
+
+  void _measure(double width) {
+    childManager.didStartLayout();
+    collectGarbage(childCount, 0);
+    var tallest = 0.0;
+    var index = 0;
+    while (addInitialChild(index: index, layoutOffset: 0)) {
+      tallest = math.max(tallest, firstChild!.getMaxIntrinsicHeight(width));
+      collectGarbage(1, 0);
+      index++;
+    }
+    childManager.didFinishLayout();
+    _extent = tallest;
+    _measuredWidth = width;
+  }
+
+  @override
+  void performLayout() {
+    if (_measuredWidth != constraints.crossAxisExtent) {
+      _measure(constraints.crossAxisExtent);
+    }
+    super.performLayout();
+  }
+}
+
+/// Lays out [children] in rows of [columns] items with equal widths.
+///
+/// Heights depend on [mode]:
+/// * [BreakifyHeightMode.equalInRow]: each row uses its tallest child's
+///   max-intrinsic height at the final column width, and its children are
+///   laid out tight to it, so `Expanded` and `Spacer` in a `Column` receive a
+///   bounded height.
+/// * [BreakifyHeightMode.equal]: like the above, but every row uses the
+///   tallest height across all rows.
+/// * [BreakifyHeightMode.natural]: children keep their own height.
 ///
 /// Children that cannot compute intrinsic dimensions (for example
 /// `LayoutBuilder`) are not supported.
-class _BreakifyEqualHeightRow extends MultiChildRenderObjectWidget {
+class _BreakifyHeightGrid extends MultiChildRenderObjectWidget {
   final int columns;
   final double spacing;
+  final double mainSpacing;
+  final BreakifyHeightMode mode;
 
-  const _BreakifyEqualHeightRow({
+  const _BreakifyHeightGrid({
     required this.columns,
     required this.spacing,
+    required this.mainSpacing,
+    required this.mode,
     required super.children,
   });
 
   @override
-  RenderObject createRenderObject(BuildContext context) =>
-      _RenderEqualHeightRow(columns: columns, spacing: spacing);
+  RenderObject createRenderObject(BuildContext context) => _RenderHeightGrid(
+        columns: columns,
+        spacing: spacing,
+        mainSpacing: mainSpacing,
+        mode: mode,
+      );
 
   @override
   void updateRenderObject(
-      BuildContext context, _RenderEqualHeightRow renderObject) {
+      BuildContext context, _RenderHeightGrid renderObject) {
     renderObject
       ..columns = columns
-      ..spacing = spacing;
+      ..spacing = spacing
+      ..mainSpacing = mainSpacing
+      ..mode = mode;
   }
 }
 
-class _EqualHeightRowParentData extends ContainerBoxParentData<RenderBox> {}
+class _HeightGridParentData extends ContainerBoxParentData<RenderBox> {}
 
-class _RenderEqualHeightRow extends RenderBox
+class _RenderHeightGrid extends RenderBox
     with
-        ContainerRenderObjectMixin<RenderBox, _EqualHeightRowParentData>,
-        RenderBoxContainerDefaultsMixin<RenderBox, _EqualHeightRowParentData> {
-  _RenderEqualHeightRow({required int columns, required double spacing})
-      : _columns = columns,
-        _spacing = spacing;
+        ContainerRenderObjectMixin<RenderBox, _HeightGridParentData>,
+        RenderBoxContainerDefaultsMixin<RenderBox, _HeightGridParentData> {
+  _RenderHeightGrid({
+    required int columns,
+    required double spacing,
+    required double mainSpacing,
+    required BreakifyHeightMode mode,
+  })  : _columns = columns,
+        _spacing = spacing,
+        _mainSpacing = mainSpacing,
+        _mode = mode;
 
   int _columns;
   int get columns => _columns;
@@ -130,10 +267,26 @@ class _RenderEqualHeightRow extends RenderBox
     markNeedsLayout();
   }
 
+  double _mainSpacing;
+  double get mainSpacing => _mainSpacing;
+  set mainSpacing(double value) {
+    if (_mainSpacing == value) return;
+    _mainSpacing = value;
+    markNeedsLayout();
+  }
+
+  BreakifyHeightMode _mode;
+  BreakifyHeightMode get mode => _mode;
+  set mode(BreakifyHeightMode value) {
+    if (_mode == value) return;
+    _mode = value;
+    markNeedsLayout();
+  }
+
   @override
   void setupParentData(RenderBox child) {
-    if (child.parentData is! _EqualHeightRowParentData) {
-      child.parentData = _EqualHeightRowParentData();
+    if (child.parentData is! _HeightGridParentData) {
+      child.parentData = _HeightGridParentData();
     }
   }
 
@@ -142,17 +295,36 @@ class _RenderEqualHeightRow extends RenderBox
     return available <= 0 ? 0 : available / columns;
   }
 
-  double _rowHeight(double width) {
+  List<double> _intrinsicRowHeights(double width) {
     final columnWidth = _columnWidth(width);
-    var height = 0.0;
+    final heights = <double>[];
+    var index = 0;
     var child = firstChild;
     while (child != null) {
       final h = child.getMaxIntrinsicHeight(columnWidth);
-      if (h > height) height = h;
+      if (index % columns == 0) {
+        heights.add(h);
+      } else if (h > heights.last) {
+        heights.last = h;
+      }
+      index++;
       child = childAfter(child);
     }
-    return height;
+    if (mode == BreakifyHeightMode.equal && heights.isNotEmpty) {
+      final tallest = heights.reduce((a, b) => a > b ? a : b);
+      return List.filled(heights.length, tallest);
+    }
+    return heights;
   }
+
+  double _totalHeight(List<double> rows) {
+    if (rows.isEmpty) return 0;
+    return rows.fold(0.0, (sum, h) => sum + h) +
+        mainSpacing * (rows.length - 1);
+  }
+
+  double _intrinsicHeight(double width) =>
+      _totalHeight(_intrinsicRowHeights(width));
 
   @override
   double computeMinIntrinsicWidth(double height) => 0;
@@ -170,42 +342,66 @@ class _RenderEqualHeightRow extends RenderBox
   }
 
   @override
-  double computeMinIntrinsicHeight(double width) => _rowHeight(width);
+  double computeMinIntrinsicHeight(double width) => _intrinsicHeight(width);
 
   @override
-  double computeMaxIntrinsicHeight(double width) => _rowHeight(width);
+  double computeMaxIntrinsicHeight(double width) => _intrinsicHeight(width);
 
   @override
   Size computeDryLayout(BoxConstraints constraints) {
     assert(constraints.hasBoundedWidth);
     final width = constraints.maxWidth;
-    return constraints.constrain(Size(width, _rowHeight(width)));
+    return constraints.constrain(Size(width, _intrinsicHeight(width)));
   }
 
   @override
   void performLayout() {
     assert(
       constraints.hasBoundedWidth,
-      'BreakifyGrid.equalHeight requires a bounded cross-axis extent.',
+      'BreakifyGrid.heightMode requires a bounded cross-axis extent.',
     );
     final width = constraints.maxWidth;
     final columnWidth = _columnWidth(width);
-    final height = constraints.constrainHeight(_rowHeight(width));
-    final childConstraints = BoxConstraints.tightFor(
-      width: columnWidth,
-      height: height,
-    );
+    final natural = mode == BreakifyHeightMode.natural;
+    final tightHeights = natural ? null : _intrinsicRowHeights(width);
+    if (tightHeights != null &&
+        tightHeights.length == 1 &&
+        constraints.hasTightHeight) {
+      tightHeights[0] = constraints.maxHeight;
+    }
 
-    var index = 0;
+    var y = 0.0;
+    var row = 0;
     var child = firstChild;
     while (child != null) {
-      child.layout(childConstraints, parentUsesSize: false);
-      (child.parentData! as _EqualHeightRowParentData).offset =
-          Offset(index * (columnWidth + spacing), 0);
-      index++;
-      child = childAfter(child);
+      final rowChildren = <RenderBox>[];
+      while (child != null && rowChildren.length < columns) {
+        rowChildren.add(child);
+        child = childAfter(child);
+      }
+
+      final childConstraints = natural
+          ? BoxConstraints(minWidth: columnWidth, maxWidth: columnWidth)
+          : BoxConstraints.tightFor(
+              width: columnWidth, height: tightHeights![row]);
+
+      var rowHeight = 0.0;
+      for (var i = 0; i < rowChildren.length; i++) {
+        final item = rowChildren[i];
+        item.layout(childConstraints, parentUsesSize: natural);
+        (item.parentData! as _HeightGridParentData).offset =
+            Offset(i * (columnWidth + spacing), y);
+        if (natural && item.size.height > rowHeight) {
+          rowHeight = item.size.height;
+        }
+      }
+      if (!natural) rowHeight = tightHeights![row];
+
+      y += rowHeight + mainSpacing;
+      row++;
     }
-    size = Size(width, height);
+    final total = row == 0 ? 0.0 : y - mainSpacing;
+    size = constraints.constrain(Size(width, total));
   }
 
   @override

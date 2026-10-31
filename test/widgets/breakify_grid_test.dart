@@ -237,7 +237,7 @@ void main() {
         width: 900,
         child: BreakifyGrid(
           columns: const BreakifyValue(sm: 2),
-          equalHeight: true,
+          heightMode: BreakifyHeightMode.equalInRow,
           children: createChildren(4),
         ),
       ),
@@ -255,7 +255,7 @@ void main() {
             sm: 2,
             lg: 4,
           ),
-          equalHeight: true,
+          heightMode: BreakifyHeightMode.equalInRow,
           children: createChildren(8),
         ),
       ),

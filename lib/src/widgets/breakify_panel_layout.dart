@@ -14,6 +14,25 @@ import 'package:flutter/widgets.dart';
 /// The horizontal layout uses [mainFlex] and [secondaryFlex]
 /// to control the width ratio between both areas.
 ///
+/// In horizontal mode, [reverse] swaps the two areas so the secondary
+/// panels are on the left and the main panel on the right, and
+/// [secondaryDirection] chooses whether the secondary panels are stacked
+/// in a [Column] (default) or placed side by side in a [Row]. Neither
+/// property affects the vertical layout.
+///
+/// ## Example
+///
+/// ```dart
+/// BreakifyPanelLayout(
+///   breakpoint: BreakifyBreakpoint.lg,
+///   spacing: const BreakifyFluidValue(sm: 12, lg: 24),
+///   reverse: true,
+///   secondaryDirection: Axis.horizontal,
+///   mainPanel: Main(),
+///   secondaryPanels: [Summary(), Actions()],
+/// )
+/// ```
+///
 /// Requires a [BreakifyScope] ancestor unless [breakpoints]
 /// is provided.
 class BreakifyPanelLayout extends StatelessWidget {
@@ -36,7 +55,37 @@ class BreakifyPanelLayout extends StatelessWidget {
   final int secondaryFlex;
 
   /// Alignment of panel contents along the cross axis.
+  ///
+  /// When [secondaryDirection] is [Axis.horizontal] in horizontal mode,
+  /// [CrossAxisAlignment.stretch] is applied as
+  /// [CrossAxisAlignment.start] for the secondary [Row], because its
+  /// height is unbounded.
   final CrossAxisAlignment crossAxisAlignment;
+
+  /// Whether to swap the position of the main panel and the secondary
+  /// panels in horizontal mode.
+  ///
+  /// When `false` (default), the main panel is on the left and the
+  /// secondary panels on the right. When `true`, the secondary panels are
+  /// on the left and the main panel on the right.
+  ///
+  /// Only the two areas are swapped: the order of [secondaryPanels] is
+  /// kept, and [mainFlex] and [secondaryFlex] still apply to the main
+  /// panel and the secondary area respectively.
+  ///
+  /// Has no effect in vertical mode.
+  final bool reverse;
+
+  /// Direction in which [secondaryPanels] are arranged in horizontal mode.
+  ///
+  /// Defaults to [Axis.vertical], which stacks them in a [Column].
+  /// With [Axis.horizontal] they are placed in a [Row] and each one
+  /// receives an equal share of the width of the secondary area
+  /// (wrapped in [Expanded]), separated by the resolved [spacing].
+  ///
+  /// Has no effect in vertical mode, where the secondary panels always
+  /// appear below the main panel.
+  final Axis secondaryDirection;
 
   /// Breakpoint configuration used to resolve responsive values.
   ///
@@ -54,6 +103,8 @@ class BreakifyPanelLayout extends StatelessWidget {
     this.secondaryFlex = 1,
     this.crossAxisAlignment = CrossAxisAlignment.stretch,
     this.breakpoints,
+    this.reverse = false,
+    this.secondaryDirection = Axis.vertical,
   })  : assert(mainFlex > 0, 'mainFlex must be greater than zero.'),
         assert(
           secondaryFlex > 0,
@@ -80,28 +131,45 @@ class BreakifyPanelLayout extends StatelessWidget {
         );
 
         if (isHorizontal) {
-          final secondaryColumn = Column(
-            crossAxisAlignment: crossAxisAlignment,
-            children: breakifyGapChildren(
-              secondaryPanels,
-              gap,
-              Axis.vertical,
+          final Widget secondaryArea = secondaryDirection == Axis.horizontal
+              ? Row(
+                  crossAxisAlignment:
+                      crossAxisAlignment == CrossAxisAlignment.stretch
+                          ? CrossAxisAlignment.start
+                          : crossAxisAlignment,
+                  children: breakifyGapChildren(
+                    [
+                      for (final panel in secondaryPanels)
+                        Expanded(child: panel),
+                    ],
+                    gap,
+                    Axis.horizontal,
+                  ),
+                )
+              : Column(
+                  crossAxisAlignment: crossAxisAlignment,
+                  children: breakifyGapChildren(
+                    secondaryPanels,
+                    gap,
+                    Axis.vertical,
+                  ),
+                );
+
+          final areas = [
+            Expanded(
+              flex: mainFlex,
+              child: mainPanel,
             ),
-          );
+            Expanded(
+              flex: secondaryFlex,
+              child: secondaryArea,
+            ),
+          ];
 
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: breakifyGapChildren(
-              [
-                Expanded(
-                  flex: mainFlex,
-                  child: mainPanel,
-                ),
-                Expanded(
-                  flex: secondaryFlex,
-                  child: secondaryColumn,
-                ),
-              ],
+              reverse ? areas.reversed.toList() : areas,
               gap,
               Axis.horizontal,
             ),

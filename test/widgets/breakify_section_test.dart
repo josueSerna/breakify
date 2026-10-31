@@ -95,6 +95,31 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('childScale enlarges the child without changing layout size',
+        (tester) async {
+      await tester.pumpWidget(createApp(
+        child: const BreakifySection(
+          minHeight: BreakifyValue(sm: 130),
+          childScale: 2,
+          child: SizedBox(key: childKey, width: 80, height: 64),
+        ),
+      ));
+
+      expect(tester.getSize(sectionFinder).height, 130);
+      expect(tester.getRect(find.byKey(childKey)).height, 128);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('childScale defaults to the unscaled child size',
+        (tester) async {
+      await tester.pumpWidget(
+        createApp(child: const BreakifySection(child: child)),
+      );
+
+      expect(tester.getRect(find.byKey(childKey)).height, 50);
+      expect(find.byType(Transform), findsNothing);
+    });
+
     testWidgets('fullViewport uses the viewport height', (tester) async {
       await tester.pumpWidget(createApp(
         height: 700,

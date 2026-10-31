@@ -41,6 +41,7 @@
 
 ## Tabla de Contenidos
 
+- [Últimas Actualizaciones Importantes](#últimas-actualizaciones-importantes)
 - [¿Qué es Breakify?](#qué-es-breakify)
 - [¿Por qué Breakify?](#por-qué-breakify)
 - [Características](#características)
@@ -59,6 +60,7 @@
   - [BreakifyListView](#breakifylistview)
   - [BreakifyContainer](#breakifycontainer)
   - [BreakifySection (experimental)](#breakifysection-experimental)
+  - [BreakifyNavbar (experimental)](#breakifynavbar-experimental)
   - [BreakifyVisibility](#breakifyvisibility)
   - [BreakifyBuilder](#breakifybuilder)
   - [BreakifyDebugBanner](#breakifydebugbanner)
@@ -67,6 +69,60 @@
 - [Contribuir](#contribuir)
 - [Licencia](#licencia)
 - [Autor](#autor)
+
+---
+
+## Últimas Actualizaciones Importantes
+
+### `heightMode` reemplaza a `equalHeight` en `BreakifyGrid` y `BreakifyResponsiveGrid`
+
+> **Cambio incompatible (breaking).** El booleano `equalHeight` ya no existe.
+> Fue reemplazado por `heightMode`, un enum `BreakifyHeightMode` nullable que
+> permite elegir *cómo* se calcula la altura de los ítems.
+
+| `heightMode` | Comportamiento | `Spacer` / `Expanded` | Carga |
+|---|---|---|---|
+| `null` (por defecto) | Los ítems se dimensionan con `childAspectRatio` | n/a | Perezosa |
+| `BreakifyHeightMode.equal` | Todos los ítems tienen exactamente la misma altura: la del ítem más alto de todo el grid | Soportado | Las filas se miden una vez y se guarda en caché; solo las filas visibles permanecen vivas |
+| `BreakifyHeightMode.equalInRow` | Los ítems de cada fila tienen la altura del ítem más alto de esa fila. Las filas pueden diferir entre sí | Soportado | Perezosa |
+| `BreakifyHeightMode.natural` | Cada ítem conserva su altura natural, alineado arriba de su fila | No soportado (altura sin límite) | Perezosa |
+
+Cuando `heightMode` no es `null`, `childAspectRatio` se ignora y las alturas
+salen del contenido. Actualmente solo soporta `Axis.vertical` en
+`BreakifyGrid`, y los hijos deben admitir medición intrínseca (widgets como
+`LayoutBuilder` no están soportados).
+
+**Migración**
+
+```dart
+// Antes
+BreakifyGrid(
+  columns: const BreakifyValue(sm: 1, md: 2, lg: 3),
+  equalHeight: true,
+  children: cards,
+)
+
+// Después (mismo comportamiento que el antiguo `equalHeight: true`)
+BreakifyGrid(
+  columns: const BreakifyValue(sm: 1, md: 2, lg: 3),
+  heightMode: BreakifyHeightMode.equalInRow,
+  children: cards,
+)
+```
+
+`equalHeight: false` pasa a ser `heightMode: null` (o simplemente omitirlo).
+
+**Cómo elegir el modo**
+
+* Usa `equalInRow` para listas largas o con scroll: es perezoso y barato.
+* Usa `equal` cuando todas las tarjetas deben verse idénticas entre filas. Su
+  primer layout y cada cambio de ancho miden todas las tarjetas, así que
+  conviene hasta unos pocos cientos de ítems.
+* Usa `natural` cuando las tarjetas deben conservar su tamaño. No pongas
+  `Spacer` ni `Expanded` en su `Column`; usa `mainAxisSize: MainAxisSize.min`.
+
+`BreakifyHeightMode` se exporta desde `package:breakify/breakify.dart`.
+Consulta el [CHANGELOG](CHANGELOG.md) para más detalles.
 
 ---
 
@@ -144,6 +200,7 @@ La lógica responsiva se mantiene centralizada, haciendo tus widgets más fácil
 * Listas responsivas (verticales y horizontales)
 * Layouts de panel principal y paneles secundarios
 * Secciones de página experimentales (`BreakifySection`)
+* Navbar responsivo experimental (`BreakifyNavbar`)
 * Visibilidad condicional según breakpoint, global o local
 * Banner de breakpoint configurable para desarrollo
 
@@ -162,7 +219,7 @@ Agrega Breakify a tu `pubspec.yaml`.
 
 ```yaml
 dependencies:
-  breakify: ^0.2.2
+  breakify: ^0.3.0
 ```
 
 Luego importa el paquete.
@@ -351,26 +408,53 @@ BreakifyAdaptativeLayout(
 `CrossAxisAlignment.stretch` al layout vertical. El espaciado puede ser un
 `BreakifyValue` o un `BreakifyFluidValue`.
 
-#### Altura igualada
+#### Distribuciones personalizadas con `order`
 
-Por defecto, cada ítem de una fila se dimensiona con `childAspectRatio`, de
-modo que una tarjeta con más contenido que sus vecinas puede desbordarse. Con
-`equalHeight: true`, el grid ignora `childAspectRatio` y calcula cada fila a
-partir de su ítem más alto: todas las tarjetas de esa fila tienen la misma
-altura y las más cortas se estiran para igualarla. Como la altura ya es
-conocida, un `Column` dentro de una tarjeta puede usar `Spacer` o `Expanded`
-para llevar un botón al final.
+`order` es opcional. Sin él, el layout se comporta exactamente como se
+muestra arriba. Al configurarlo, `layoutBelow` se usa por debajo de
+`breakpoint` y `layoutAbove` desde `breakpoint` en adelante.
 
 ```dart
-BreakifyGrid(
-  columns: const BreakifyValue(sm: 1, md: 2, lg: 3),
-  equalHeight: true,
-  children: [
-    Card(child: Text('Contenido corto')),
-    Card(child: Text('Contenido que necesita más espacio vertical.')),
-  ],
+BreakifyAdaptativeLayout(
+  breakpoint: BreakifyBreakpoint.lg,
+  spacing: const BreakifyFluidValue(sm: 12, lg: 24),
+  children: [Title(), Description(), Image()],
+  order: const BreakifyLayoutOrder(
+    layoutBelow: BreakifyLayoutTemplate.twoRows,
+    layoutAbove: BreakifyLayoutTemplate.twoColumns,
+  ),
 )
 ```
+
+| Plantilla | Resultado |
+|---|---|
+| `inRow` | Todos los hijos en una fila. |
+| `inColumn` | Todos los hijos en una columna. |
+| `twoRows` | Dos filas, una debajo de la otra. |
+| `twoColumns` | Dos columnas, una al lado de la otra. |
+| `custom(left:, right:)` | Dos columnas con hijos elegidos. |
+
+En `twoRows` y `twoColumns`, los primeros `ceil(n / 2)` hijos van al primer
+grupo (fila superior / columna izquierda) y el resto al segundo. Con tres
+hijos: `[0, 1]` y `[2]`.
+
+Con `custom`, los índices corresponden a posiciones en la lista original de
+`children` (`0` = `Title()`, `1` = `Description()`, `2` = `Image()`):
+
+```dart
+order: const BreakifyLayoutOrder(
+  layoutBelow: BreakifyLayoutTemplate.inColumn,
+  layoutAbove: BreakifyLayoutTemplate.custom(
+    left: [0, 1],
+    right: [2],
+  ),
+),
+```
+
+Cada hijo debe aparecer exactamente una vez y ninguna lista puede estar
+vacía; de lo contrario se lanza un error en modo debug. Los grupos no igualan
+su altura: un hijo solo en un grupo (como una imagen) conserva su propia
+altura salvo que él mismo defina su tamaño.
 
 ---
 
@@ -405,13 +489,20 @@ También soporta:
   para desplazarse hacia los lados en vez de verticalmente. En este modo,
   `columns` controla el número de filas en vez de columnas, y
   `childAspectRatio` se sigue expresando como ancho / alto.
-* **Filas de igual altura** — configura `equalHeight: true` para que
-  todos los ítems de una fila igualen la altura del ítem más alto de esa
-  fila. Útil para grids con ítems de altura intrínseca variable. La altura
-  de la fila se mide una vez y los ítems reciben esa altura exacta, por lo
-  que `Spacer` y `Expanded` dentro de un `Column` funcionan. Los hijos deben
-  admitir medición intrínseca (por ejemplo, `LayoutBuilder` no está
-  soportado). Actualmente solo soportado con `Axis.vertical`.
+* **Modos de altura** — configura `heightMode` (un `BreakifyHeightMode`) para
+  dimensionar los ítems según su contenido en lugar de `childAspectRatio`,
+  que entonces se ignora.
+  * `BreakifyHeightMode.equal`: todos los ítems tienen la misma altura (la
+    del más alto de todo el grid).
+  * `BreakifyHeightMode.equalInRow`: los ítems de cada fila igualan al más
+    alto de esa fila; las filas pueden diferir.
+  * `BreakifyHeightMode.natural`: cada ítem conserva su propia altura.
+
+  Las alturas se miden una vez, por lo que `Spacer` y `Expanded` dentro de un
+  `Column` funcionan (excepto con `natural`). Los hijos deben admitir
+  medición intrínseca (`LayoutBuilder` no está soportado). Actualmente solo
+  soportado con `Axis.vertical`. Consulta
+  [Últimas Actualizaciones Importantes](#últimas-actualizaciones-importantes).
 
 ```dart
 BreakifyGrid(
@@ -451,21 +542,19 @@ el resultado y siempre se usa al menos una columna. A diferencia de
 `BreakifyGrid`, este widget no requiere definir un valor para cada breakpoint y
 responde al ancho local proporcionado por su padre.
 
-Configura `equalHeight: true` para que los ítems de cada fila tengan la altura
-del ítem más alto de esa fila. Sin esta opción, cada ítem se dimensiona con
-`childAspectRatio`, por lo que una tarjeta con más contenido que sus vecinas
-puede desbordarse. Con ella, el número de columnas se sigue calculando según el
-ancho disponible, pero cada fila se dimensiona a partir de su ítem más alto y
-las demás tarjetas se estiran para igualarlo. Es opcional, ignora
-`childAspectRatio` y no impone una altura fija. `Spacer` y `Expanded` dentro
-del `Column` de una tarjeta funcionan porque la altura de la fila es conocida.
+Configura `heightMode` (`BreakifyHeightMode.equal`, `equalInRow` o `natural`)
+para dimensionar los ítems según su contenido. Es opcional (`null` por
+defecto) e ignora `childAspectRatio`. El número de columnas se sigue
+calculando según el ancho disponible. Consulta
+[Últimas Actualizaciones Importantes](#últimas-actualizaciones-importantes)
+para ver el comportamiento de cada modo.
 
 ```dart
 BreakifyResponsiveGrid(
   minItemWidth: 220,
   maxColumns: 3,
   spacing: 16,
-  equalHeight: true,
+  heightMode: BreakifyHeightMode.equalInRow,
   children: [
     Card(child: Text('Contenido corto')),
     Card(child: Text('Contenido que necesita más espacio vertical.')),
@@ -501,6 +590,29 @@ horizontal. Si `secondaryPanels` está vacío, el layout permanece vertical. El
 breakpoint se resuelve usando el ancho local disponible para el layout, por lo
 que el padding o las constraints del padre pueden hacer que sea diferente del
 breakpoint global de la pantalla.
+
+#### `reverse` y `secondaryDirection`
+
+Ambas solo afectan al layout horizontal (el modo vertical no cambia).
+
+```dart
+BreakifyPanelLayout(
+  breakpoint: BreakifyBreakpoint.lg,
+  spacing: const BreakifyFluidValue(sm: 12, lg: 24),
+  reverse: true,
+  secondaryDirection: Axis.horizontal,
+  mainPanel: MainContent(),
+  secondaryPanels: [SummaryCard(), ActionsCard()],
+)
+```
+
+- `reverse` (por defecto `false`): con `true`, los paneles secundarios van a
+  la izquierda y el principal a la derecha. El orden de `secondaryPanels` se
+  conserva, y `mainFlex` / `secondaryFlex` siguen aplicando a su área.
+- `secondaryDirection` (por defecto `Axis.vertical`): con `Axis.horizontal`,
+  los paneles secundarios se colocan en un `Row`, cada uno con el mismo ancho
+  y separados por `spacing`. En ese `Row`, `CrossAxisAlignment.stretch` se
+  aplica como `start` porque su alto no está acotado.
 
 ---
 
@@ -553,20 +665,26 @@ BreakifyContainer(
 
 ### BreakifySection (experimental)
 
-> **Experimental en 0.2.2:** su API podría cambiar en próximas versiones.
+> **Experimental en 0.3.0:** su API podría cambiar en próximas versiones.
 
 Sección de ancho completo para páginas web y landing pages. Admite fondo,
-alineación, `padding` y `minHeight` responsivos, y `fullViewport`.
+alineación, `padding` y `minHeight` responsivos, y `fullViewport`. Usa
+`childScale` para agrandar o reducir visualmente el contenido sin cambiar el
+espacio que reserva el layout; puede ser útil para escalar un logo en el
+footer. La sección no recorta el contenido que sobresale al escalarlo, aunque
+un widget ancestro sí podría hacerlo.
 
 ```dart
 BreakifySection(
   backgroundColor: Colors.indigo.shade50,
-  fullViewport: true,
+  minHeight: const BreakifyValue(sm: 130),
+  childScale: 2,
+  alignment: Alignment.centerRight,
   padding: const BreakifyValue<EdgeInsetsGeometry>(
     sm: EdgeInsets.all(16),
     lg: EdgeInsets.symmetric(horizontal: 96, vertical: 48),
   ),
-  child: const BreakifyContainer(child: Hero()),
+  child: const FlutterLogo(size: 64),
 )
 ```
 
@@ -576,6 +694,59 @@ BreakifySection(
 el mayor. La sección crece cuando su contenido lo necesita y no crea scroll
 propio, así que colócala dentro de un `ListView` o `SingleChildScrollView`.
 Requiere un `BreakifyScope`.
+
+---
+
+### BreakifyNavbar (experimental)
+
+> **Experimental en 0.3.0:** su API podría cambiar en próximas versiones.
+
+Navbar responsivo. Desde el `breakpoint` (por defecto `md`) las opciones se
+muestran en horizontal; por debajo, un botón hamburguesa abre un menú
+`dropdown` o `drawer`.
+
+```dart
+BreakifyNavbar(
+  logo: Image.asset('assets/logo.png', height: 32),
+  items: [
+    BreakifyNavbarItem(label: 'Inicio', icon: Icons.home, onTap: () {}),
+    BreakifyNavbarItem(label: 'Servicios', icon: Icons.work, onTap: () {}),
+    BreakifyNavbarItem(label: 'Contacto', onTap: () {}, enabled: false),
+  ],
+  menuType: BreakifyNavbarMenuType.drawer,
+  drawerSide: BreakifyNavbarDrawerSide.right,
+  scrollBehavior: BreakifyNavbarScrollBehavior.hideOnScroll,
+  body: ListView(children: [/* contenido de la página */]),
+)
+```
+
+- `menuType`: `dropdown` (se despliega bajo el navbar) o `drawer` (panel
+  lateral sobre el contenido; se cierra tocando fuera, con el icono de cierre
+  o al elegir una opción).
+- `scrollBehavior`: `fixed` (siempre visible, por defecto), `static` (se va
+  con el contenido) o `hideOnScroll` (se oculta al bajar y vuelve al subir;
+  `scrollThreshold` define la sensibilidad).
+- También configurable: `logo`, `menuIcon`, `closeIcon`, `backgroundColor`,
+  `foregroundColor`, `menuBackgroundColor`, `height`, `padding`,
+  `itemSpacing`, `drawerWidth`, `drawerOverlayColor`, `animationDuration`
+  y `elevation`.
+- `logoMaxHeight` (por defecto 80): el logo ya no se comprime al `height` de
+  la barra; puede crecer hasta este valor, centrado, y se pinta fuera de los
+  bordes de la barra (sin recorte) si es más alto que `height`.
+
+Limitaciones conocidas:
+
+- Requiere un `BreakifyScope` y un ancestro Material.
+- Envuelve el contenido de la página en `body`. Escucha las notificaciones de
+  scroll de `body` y nunca usa un `ScrollController`.
+- Con `fixed` y `hideOnScroll` el body se coloca debajo del navbar. Con
+  `static` el navbar se superpone al body, que debe aplicar el padding
+  superior (`MediaQuery.paddingOf(context).top`) si usa un `padding` propio,
+  `SingleChildScrollView` o `CustomScrollView`.
+- `static` y `hideOnScroll` necesitan un scrollable vertical de nivel
+  superior en `body`.
+- Las opciones de escritorio no hacen scroll: demasiadas opciones desbordan.
+- El botón atrás de Android no cierra el menú móvil.
 
 ---
 
