@@ -25,7 +25,6 @@ the experimental `BreakifyNavbar`.
   as `start` in that `Row` because its height is unbounded.
 - Example screen for `reverse` and `secondaryDirection`, reachable from the
   BreakifyPanelLayout section of the example app.
-- README (EN/ES) documentation for both properties.
 - `BreakifyAdaptativeLayout.order`: optional `BreakifyLayoutOrder` with
   `layoutBelow` / `layoutAbove` distributions chosen from the configured
   `breakpoint`. Templates (`BreakifyLayoutTemplate`): `inRow`, `inColumn`,
@@ -37,7 +36,8 @@ the experimental `BreakifyNavbar`.
   heights are not equalized, so a child in a shorter group (e.g. an image)
   keeps its own height unless it sizes itself, optionally with
   `crossAxisAlignment: CrossAxisAlignment.stretch`.
-- Example screen "Layout Order" for `BreakifyAdaptativeLayout`.
+- Example screen "Layout Order" for `BreakifyAdaptativeLayout`, and README
+  (EN/ES) documentation for `order`.
 - Added the opt-in `childScale` property to the experimental `BreakifySection`
   to visually scale its child without changing its layout size.
 - `BreakifyNavbar.logoMaxHeight` (default 80): the logo is no longer

@@ -407,6 +407,54 @@ BreakifyAdaptativeLayout(
 `CrossAxisAlignment.stretch` to the vertical layout. Spacing can be a
 `BreakifyValue` or a `BreakifyFluidValue`.
 
+#### Custom distributions with `order`
+
+`order` is optional. Without it, the layout behaves exactly as shown above.
+When set, `layoutBelow` is used below `breakpoint` and `layoutAbove` from
+`breakpoint` onward.
+
+```dart
+BreakifyAdaptativeLayout(
+  breakpoint: BreakifyBreakpoint.lg,
+  spacing: const BreakifyFluidValue(sm: 12, lg: 24),
+  children: [Title(), Description(), Image()],
+  order: const BreakifyLayoutOrder(
+    layoutBelow: BreakifyLayoutTemplate.twoRows,
+    layoutAbove: BreakifyLayoutTemplate.twoColumns,
+  ),
+)
+```
+
+| Template | Result |
+|---|---|
+| `inRow` | All children in one row. |
+| `inColumn` | All children in one column. |
+| `twoRows` | Two rows, one below the other. |
+| `twoColumns` | Two columns, side by side. |
+| `custom(left:, right:)` | Two columns with explicit children. |
+
+For `twoRows` and `twoColumns`, the first `ceil(n / 2)` children go in the
+first group (top row / left column) and the rest in the second. With three
+children: `[0, 1]` and `[2]`.
+
+With `custom`, the indices refer to positions in the original `children`
+list (`0` = `Title()`, `1` = `Description()`, `2` = `Image()`):
+
+```dart
+order: const BreakifyLayoutOrder(
+  layoutBelow: BreakifyLayoutTemplate.inColumn,
+  layoutAbove: BreakifyLayoutTemplate.custom(
+    left: [0, 1],
+    right: [2],
+  ),
+),
+```
+
+Every child must appear exactly once and neither list may be empty;
+otherwise an error is thrown in debug mode. Groups are not height-equalized:
+a child alone in a group (such as an image) keeps its own height unless it
+sizes itself.
+
 ---
 
 ### BreakifyGrid
