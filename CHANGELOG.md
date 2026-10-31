@@ -16,6 +16,16 @@ the experimental `BreakifyNavbar`.
 
 ## Added
 
+- `BreakifyPanelLayout.reverse` (default `false`): in horizontal mode, puts
+  the secondary panels on the left and the main panel on the right without
+  reversing the order of `secondaryPanels`.
+- `BreakifyPanelLayout.secondaryDirection` (default `Axis.vertical`): with
+  `Axis.horizontal`, the secondary panels are placed in a `Row` with equal
+  shares of width in horizontal mode. `CrossAxisAlignment.stretch` is applied
+  as `start` in that `Row` because its height is unbounded.
+- Example screen for `reverse` and `secondaryDirection`, reachable from the
+  BreakifyPanelLayout section of the example app.
+- README (EN/ES) documentation for both properties.
 - `BreakifyAdaptativeLayout.order`: optional `BreakifyLayoutOrder` with
   `layoutBelow` / `layoutAbove` distributions chosen from the configured
   `breakpoint`. Templates (`BreakifyLayoutTemplate`): `inRow`, `inColumn`,

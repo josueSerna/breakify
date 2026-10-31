@@ -1,4 +1,6 @@
 import 'package:breakify/breakify.dart';
+import 'package:example/features/breakify_panel_layout/screen/panel_layout_options_screen.dart';
+import 'package:example/presentation/widgets/example_card.dart';
 import 'package:flutter/material.dart';
 
 class BreakifyPanelLayoutScreen extends StatelessWidget {
@@ -54,6 +56,14 @@ class BreakifyPanelLayoutScreen extends StatelessWidget {
                   height: 120,
                 ),
               ],
+            ),
+            const SizedBox(height: 40),
+            const ExampleCard(
+              title: 'reverse & secondaryDirection',
+              description: 'Swaps the main and secondary areas and arranges '
+                  'the secondary panels in a Row or a Column.',
+              icon: Icons.swap_horiz,
+              page: PanelLayoutOptionsScreen(),
             ),
           ],
         ),

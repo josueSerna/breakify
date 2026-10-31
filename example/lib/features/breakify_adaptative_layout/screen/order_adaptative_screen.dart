@@ -64,7 +64,6 @@ class OrderAdaptativeScreen extends StatelessWidget {
                 _Block('Title', Colors.indigo, 60),
                 _Block('Description', Colors.teal, 100),
                 _Block('Image', Colors.orange, 160),
-                _Block('Image', Colors.orange, 160),
               ],
             ),
           ],

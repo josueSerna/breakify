@@ -543,6 +543,29 @@ breakpoint se resuelve usando el ancho local disponible para el layout, por lo
 que el padding o las constraints del padre pueden hacer que sea diferente del
 breakpoint global de la pantalla.
 
+#### `reverse` y `secondaryDirection`
+
+Ambas solo afectan al layout horizontal (el modo vertical no cambia).
+
+```dart
+BreakifyPanelLayout(
+  breakpoint: BreakifyBreakpoint.lg,
+  spacing: const BreakifyFluidValue(sm: 12, lg: 24),
+  reverse: true,
+  secondaryDirection: Axis.horizontal,
+  mainPanel: MainContent(),
+  secondaryPanels: [SummaryCard(), ActionsCard()],
+)
+```
+
+- `reverse` (por defecto `false`): con `true`, los paneles secundarios van a
+  la izquierda y el principal a la derecha. El orden de `secondaryPanels` se
+  conserva, y `mainFlex` / `secondaryFlex` siguen aplicando a su área.
+- `secondaryDirection` (por defecto `Axis.vertical`): con `Axis.horizontal`,
+  los paneles secundarios se colocan en un `Row`, cada uno con el mismo ancho
+  y separados por `spacing`. En ese `Row`, `CrossAxisAlignment.stretch` se
+  aplica como `start` porque su alto no está acotado.
+
 ---
 
 ### BreakifyListView

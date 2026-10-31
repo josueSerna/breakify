@@ -536,6 +536,30 @@ the main panel and the secondary panel column are arranged horizontally.
 resolved from the layout's available local width, so padding or parent
 constraints can make it differ from the global screen breakpoint.
 
+#### `reverse` and `secondaryDirection`
+
+Both only affect the horizontal layout (vertical mode is unchanged).
+
+```dart
+BreakifyPanelLayout(
+  breakpoint: BreakifyBreakpoint.lg,
+  spacing: const BreakifyFluidValue(sm: 12, lg: 24),
+  reverse: true,
+  secondaryDirection: Axis.horizontal,
+  mainPanel: MainContent(),
+  secondaryPanels: [SummaryCard(), ActionsCard()],
+)
+```
+
+- `reverse` (default `false`): with `true`, the secondary panels go on the
+  left and the main panel on the right. The order of `secondaryPanels` is
+  kept, and `mainFlex` / `secondaryFlex` still apply to their own area.
+- `secondaryDirection` (default `Axis.vertical`): with `Axis.horizontal`,
+  the secondary panels are placed in a `Row`, each with an equal share of the
+  width and separated by `spacing`. In that `Row`,
+  `CrossAxisAlignment.stretch` is applied as `start` because its height is
+  unbounded.
+
 ---
 
 ### BreakifyListView
