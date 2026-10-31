@@ -25,7 +25,7 @@
   <a href="https://github.com/josueSerna/breakify/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT">
   </a>
-  <img src="https://img.shields.io/badge/flutter-%3E%3D3.10.0-02569B?logo=flutter" alt="Flutter SDK">
+  <img src="https://img.shields.io/badge/flutter-%3E%3D3.27.0-02569B?logo=flutter" alt="Flutter SDK">
 </p>
 
 <p align="center">
@@ -209,7 +209,7 @@ The responsive logic stays centralized, making your widgets easier to read, main
 ## Requirements
 
 * Dart SDK `>=3.0.0`
-* Flutter SDK `>=3.10.0`
+* Flutter SDK `>=3.27.0`
 
 ---
 
@@ -317,6 +317,10 @@ For example:
 | xl         |     4 |
 | xxl        |     4 |
 
+`BreakifyValue` is generic, so it can resolve values such as `int`, `double`,
+`EdgeInsets`, or other types used by responsive widgets. The `sm` value is
+required; higher breakpoints inherit the closest value defined before them.
+
 ---
 
 ## Fluid Values
@@ -325,11 +329,7 @@ Need values to scale smoothly instead of changing abruptly?
 
 Use `BreakifyFluidValue`.
 
-```
-
-`BreakifyValue` is generic, so it can resolve values such as `int`, `double`,
-`EdgeInsets`, or other types used by responsive widgets. The `sm` value is
-required; higher breakpoints inherit the closest value defined before them.dart
+```dart
 const spacing = BreakifyFluidValue(
   sm: 8,
   md: 16,

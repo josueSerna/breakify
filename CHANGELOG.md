@@ -13,6 +13,8 @@ the experimental `BreakifyNavbar`.
   - `equalHeight: false` → `heightMode: null` (default); items keep using
     `childAspectRatio`.
 - When `heightMode` is not `null`, `childAspectRatio` is ignored.
+- Raised the minimum supported version to Flutter `3.27.0`
+  (`BreakifyNavbar` uses `Color.withValues`).
 
 ## Added
 

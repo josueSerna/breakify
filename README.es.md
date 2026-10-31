@@ -25,7 +25,7 @@
   <a href="https://github.com/josueSerna/breakify/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT">
   </a>
-  <img src="https://img.shields.io/badge/flutter-%3E%3D3.10.0-02569B?logo=flutter" alt="Flutter SDK">
+  <img src="https://img.shields.io/badge/flutter-%3E%3D3.27.0-02569B?logo=flutter" alt="Flutter SDK">
 </p>
 
 <p align="center">
@@ -209,7 +209,7 @@ La lógica responsiva se mantiene centralizada, haciendo tus widgets más fácil
 ## Requisitos
 
 * Dart SDK `>=3.0.0`
-* Flutter SDK `>=3.10.0`
+* Flutter SDK `>=3.27.0`
 
 ---
 
@@ -318,6 +318,11 @@ Por ejemplo:
 | xl         |     4 |
 | xxl        |     4 |
 
+`BreakifyValue` es genérico, por lo que puede resolver valores como `int`,
+`double`, `EdgeInsets` u otros tipos usados por los widgets responsivos. El
+valor `sm` es obligatorio; los breakpoints superiores heredan el valor más
+reciente que haya sido definido.
+
 ---
 
 ## Valores Fluidos
@@ -326,12 +331,7 @@ Por ejemplo:
 
 Usa `BreakifyFluidValue`.
 
-```
-
-`BreakifyValue` es genérico, por lo que puede resolver valores como `int`,
-`double`, `EdgeInsets` u otros tipos usados por los widgets responsivos. El
-valor `sm` es obligatorio; los breakpoints superiores heredan el valor más
-reciente que haya sido definido.dart
+```dart
 const spacing = BreakifyFluidValue(
   sm: 8,
   md: 16,
