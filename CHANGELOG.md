@@ -18,6 +18,9 @@ the experimental `BreakifyNavbar`.
 
 - Added the opt-in `childScale` property to the experimental `BreakifySection`
   to visually scale its child without changing its layout size.
+- `BreakifyNavbar.logoMaxHeight` (default 80): the logo is no longer
+  constrained to the bar `height`, so taller images (up to 80 px) are shown
+  at their size instead of being squeezed to 64.
 - `BreakifyNavbar` (**experimental**, API may change): responsive navbar that
   shows its items inline from a breakpoint and a hamburger menu below it, with
   `BreakifyNavbarItem`, `BreakifyNavbarMenuType` (`dropdown`, `drawer`),

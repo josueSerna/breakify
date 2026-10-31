@@ -651,6 +651,9 @@ BreakifyNavbar(
   `foregroundColor`, `menuBackgroundColor`, `height`, `padding`,
   `itemSpacing`, `drawerWidth`, `drawerOverlayColor`, `animationDuration`
   and `elevation`.
+- `logoMaxHeight` (default 80): the logo is no longer squeezed into the bar
+  `height`; it can grow up to this value, centered, and paints beyond the bar
+  edges (not clipped) if it is taller than `height`.
 
 Known limitations:
 

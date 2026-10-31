@@ -659,6 +659,9 @@ BreakifyNavbar(
   `foregroundColor`, `menuBackgroundColor`, `height`, `padding`,
   `itemSpacing`, `drawerWidth`, `drawerOverlayColor`, `animationDuration`
   y `elevation`.
+- `logoMaxHeight` (por defecto 80): el logo ya no se comprime al `height` de
+  la barra; puede crecer hasta este valor, centrado, y se pinta fuera de los
+  bordes de la barra (sin recorte) si es más alto que `height`.
 
 Limitaciones conocidas:
 

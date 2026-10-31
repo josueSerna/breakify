@@ -111,6 +111,13 @@ class BreakifyNavbar extends StatefulWidget {
   /// Height of the bar, excluding the top safe area. Defaults to 64.
   final double height;
 
+  /// Maximum height the [logo] can take in the bar. Defaults to 80.
+  ///
+  /// The logo is no longer limited to [height]: if it is taller than the bar
+  /// (up to this value) it is centered and paints beyond the bar's edges
+  /// without being clipped. Increase [height] to give it room.
+  final double logoMaxHeight;
+
   /// Inner horizontal padding of the bar. Defaults to 16 on both sides.
   final EdgeInsetsGeometry padding;
 
@@ -151,6 +158,7 @@ class BreakifyNavbar extends StatefulWidget {
     this.backgroundColor,
     this.foregroundColor,
     this.height = 64,
+    this.logoMaxHeight = 80,
     this.padding = const EdgeInsets.symmetric(horizontal: 16),
     this.itemSpacing = 8,
     this.menuBackgroundColor,
@@ -319,6 +327,7 @@ class _BreakifyNavbarState extends State<BreakifyNavbar>
                     onMenuPressed: _toggleMenu,
                     logo: widget.logo,
                     height: widget.height,
+                    logoMaxHeight: widget.logoMaxHeight,
                     topInset: topInset,
                     padding: widget.padding,
                     itemSpacing: widget.itemSpacing,

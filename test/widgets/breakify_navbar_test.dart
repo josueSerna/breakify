@@ -52,6 +52,30 @@ void main() {
 
   setUp(() => tapped = '');
 
+  testWidgets('logo can be taller than the bar up to logoMaxHeight',
+      (tester) async {
+    await setSize(tester, 1000);
+    Widget app(double logoHeight) => BreakifyScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: BreakifyNavbar(
+                logo: SizedBox(
+                    key: const ValueKey('logo'), width: 50, height: logoHeight),
+                items: [BreakifyNavbarItem(label: 'Home', onTap: () {})],
+                body: const SizedBox(),
+              ),
+            ),
+          ),
+        );
+
+    await tester.pumpWidget(app(130));
+    expect(tester.getSize(find.byKey(const ValueKey('logo'))).height, 80);
+
+    await tester.pumpWidget(app(72));
+    expect(tester.getSize(find.byKey(const ValueKey('logo'))).height, 72);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('shows items inline on desktop, hamburger on mobile',
       (tester) async {
     await setSize(tester, 1000);

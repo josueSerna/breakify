@@ -13,6 +13,7 @@ class BreakifyNavbarBar extends StatelessWidget {
     required this.onMenuPressed,
     required this.logo,
     required this.height,
+    required this.logoMaxHeight,
     required this.topInset,
     required this.padding,
     required this.itemSpacing,
@@ -30,6 +31,7 @@ class BreakifyNavbarBar extends StatelessWidget {
   final VoidCallback onMenuPressed;
   final Widget? logo;
   final double height;
+  final double logoMaxHeight;
   final double topInset;
   final EdgeInsetsGeometry padding;
   final double itemSpacing;
@@ -53,39 +55,47 @@ class BreakifyNavbarBar extends StatelessWidget {
           height: height,
           child: Padding(
             padding: padding,
-            child: Row(
-              children: [
-                if (logo != null) logo!,
-                const Spacer(),
-                if (desktop)
-                  for (var i = 0; i < items.length; i++) ...[
-                    if (i > 0) SizedBox(width: itemSpacing),
-                    _DesktopItem(
-                      item: items[i],
-                      foregroundColor: foregroundColor,
-                    ),
-                  ]
-                else
-                  IconButton(
-                    onPressed: onMenuPressed,
-                    color: foregroundColor,
-                    tooltip: menuOpen
-                        ? localizations.closeButtonTooltip
-                        : localizations.showMenuTooltip,
-                    icon: AnimatedSwitcher(
-                      duration: animationDuration,
-                      transitionBuilder: (child, animation) =>
-                          RotationTransition(
-                        turns: Tween(begin: 0.75, end: 1.0).animate(animation),
-                        child: FadeTransition(opacity: animation, child: child),
+            // Lets the logo grow up to logoMaxHeight even when it is taller
+            // than the bar; the row stays centered and overflows evenly.
+            child: OverflowBox(
+              minHeight: 0,
+              maxHeight: logoMaxHeight > height ? logoMaxHeight : height,
+              child: Row(
+                children: [
+                  if (logo != null) logo!,
+                  const Spacer(),
+                  if (desktop)
+                    for (var i = 0; i < items.length; i++) ...[
+                      if (i > 0) SizedBox(width: itemSpacing),
+                      _DesktopItem(
+                        item: items[i],
+                        foregroundColor: foregroundColor,
                       ),
-                      child: Icon(
-                        menuOpen ? closeIcon : menuIcon,
-                        key: ValueKey(menuOpen),
+                    ]
+                  else
+                    IconButton(
+                      onPressed: onMenuPressed,
+                      color: foregroundColor,
+                      tooltip: menuOpen
+                          ? localizations.closeButtonTooltip
+                          : localizations.showMenuTooltip,
+                      icon: AnimatedSwitcher(
+                        duration: animationDuration,
+                        transitionBuilder: (child, animation) =>
+                            RotationTransition(
+                          turns:
+                              Tween(begin: 0.75, end: 1.0).animate(animation),
+                          child:
+                              FadeTransition(opacity: animation, child: child),
+                        ),
+                        child: Icon(
+                          menuOpen ? closeIcon : menuIcon,
+                          key: ValueKey(menuOpen),
+                        ),
                       ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
